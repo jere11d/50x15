@@ -1,0 +1,167 @@
+[
+    {
+        "nivel": 1,
+        "pregunta": "¿Quién construyó el arca para salvar a su familia del diluvio?",
+        "opciones": [
+            "Moisés",
+            "Noé",
+            "Abraham",
+            "David"
+        ],
+        "correcta": 1
+    },
+    {
+        "nivel": 1,
+        "pregunta": "¿Cuál fue el primer hombre que el Señor creó?",
+        "opciones": [
+            "Abel",
+            "Caín",
+            "Adán",
+            "Seth"
+        ],
+        "correcta": 2
+    },
+    {
+        "nivel": 2,
+        "pregunta": "¿Qué joven pastor derrotó al gigante Goliat con una honda y una piedra?",
+        "opciones": [
+            "Saúl",
+            "Salomón",
+            "David",
+            "Josué"
+        ],
+        "correcta": 2
+    },
+    {
+        "nivel": 2,
+        "pregunta": "¿En qué ciudad nació nuestro Salvador Jesucristo?",
+        "opciones": [
+            "Nazaret",
+            "Jerusalén",
+            "Belén",
+            "Jericó"
+        ],
+        "correcta": 2
+    },
+    {
+        "nivel": 3,
+        "pregunta": "¿Cuántos fueron los discípulos principales elegidos por Jesús?",
+        "opciones": [
+            "10",
+            "12",
+            "7",
+            "40"
+        ],
+        "correcta": 1
+    },
+    {
+        "nivel": 3,
+        "pregunta": "¿A quién llamó el Señor para sacar al pueblo de Israel de la esclavitud en Egipto?",
+        "opciones": [
+            "Moisés",
+            "Aarón",
+            "José",
+            "Gedeón"
+        ],
+        "correcta": 0
+    },
+    {
+        "nivel": 4,
+        "pregunta": "¿Quién fue tragado por un gran pez por intentar huir de la presencia del Señor?",
+        "opciones": [
+            "Pedro",
+            "Jonás",
+            "Elías",
+            "Daniel"
+        ],
+        "correcta": 1
+    },
+    {
+        "nivel": 4,
+        "pregunta": "¿Cómo se llamaba la madre de Jesús según la carne?",
+        "opciones": [
+            "Marta",
+            "Isabel",
+            "María",
+            "Magdalena"
+        ],
+        "correcta": 2
+    },
+    {
+        "nivel": 5,
+        "pregunta": "¿Cuál fue el primer milagro público que realizó Jesús?",
+        "opciones": [
+            "Caminar sobre el agua",
+            "Sanar a un ciego",
+            "Multiplicar los panes",
+            "Convertir el agua en vino"
+        ],
+        "correcta": 3
+    },
+    {
+        "nivel": 6,
+        "pregunta": "¿Cuál es el primer libro de la Biblia?",
+        "opciones": [
+            "Éxodo",
+            "Salmos",
+            "Génesis",
+            "Mateo"
+        ],
+        "correcta": 2
+    },
+    {
+        "nivel": 7,
+        "pregunta": "¿Quién fue el hombre que recibió del Señor la mayor sabiduría?",
+        "opciones": [
+            "Salomón",
+            "Ezequiel",
+            "Job",
+            "Daniel"
+        ],
+        "correcta": 0
+    },
+    {
+        "nivel": 8,
+        "pregunta": "¿Qué apóstol negó al Señor tres veces antes de que el gallo cantara?",
+        "opciones": [
+            "Juan",
+            "Tomás",
+            "Pedro",
+            "Judas"
+        ],
+        "correcta": 2
+    },
+    {
+        "nivel": 9,
+        "pregunta": "¿En qué libro de la Biblia se encuentran los Diez Mandamientos por primera vez?",
+        "opciones": [
+            "Levítico",
+            "Éxodo",
+            "Números",
+            "Deuteronomio"
+        ],
+        "correcta": 1
+    },
+    {
+        "nivel": 10,
+        "pregunta": "¿Quién fue el profeta que fue llevado al cielo en un torbellino y un carro de fuego?",
+        "opciones": [
+            "Eliseo",
+            "Isaías",
+            "Elías",
+            "Jeremías"
+        ],
+        "correcta": 2
+    },
+    {
+        "nivel": 11,
+        "pregunta": "¿Cuál es el último libro de la Biblia, que habla sobre las revelaciones de Jesucristo?",
+        "opciones": [
+            "Judas",
+            "Apocalipsis",
+            "Hebreos",
+            "Hechos"
+        ],
+        "correcta": 1
+    }
+]

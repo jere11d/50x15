@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Votar - 50x15 Público</title>
+    <style>
+        body { margin:0; font-family: 'Arial Black', sans-serif; background: #020230; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow:hidden;}
+        h1 { color: #ffd700; text-align:center; font-size:2rem; }
+        .btn-vote { width: 90vw; margin: 10px 0; padding: 20px; font-size: 2.5rem; font-weight: bold; color: white; border: 3px solid white; border-radius: 15px; cursor: pointer; text-transform: uppercase; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        #btn-A { background: #ff4444; }
+        #btn-B { background: #4444ff; }
+        #btn-C { background: #ffaa00; }
+        #btn-D { background: #44ff44; }
+        .btn-vote:active { transform: scale(0.95); opacity: 0.8; }
+        #msg { font-size: 1.5rem; text-align: center; margin-top:20px; padding: 20px; display:none; background:#ffd700; color:black; border-radius:10px; width: 80vw;}
+        #loader { display:none; font-size: 1.2rem; margin-top:20px;}
+    </style>
+</head>
+<body>
+    <div id="voting-area">
+        <h1>¡ELIGE TU RESPUESTA!</h1>
+        <button id="btn-A" class="btn-vote" onclick="castVote('A')">A</button>
+        <button id="btn-B" class="btn-vote" onclick="castVote('B')">B</button>
+        <button id="btn-C" class="btn-vote" onclick="castVote('C')">C</button>
+        <button id="btn-D" class="btn-vote" onclick="castVote('D')">D</button>
+    </div>
+    <div id="msg"></div>
+    <div id="loader">Conectando...</div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
+        // --- CONFIGURACIÓN FIREBASE PARA PÚBLICO EN VIVO ---
+        const firebaseConfig = {
+            // REEMPLAZAR CON TUS CREDENCIALES DE FIREBASE (Proyecto de Configuración)
+            apiKey: "TU_API_KEY",
+            authDomain: "tu-proyecto.firebaseapp.com",
+            databaseURL: "https://tu-proyecto.firebaseio.com",
+            projectId: "tu-proyecto",
+            storageBucket: "tu-proyecto.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:1234:web:xyz"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        
+        let hasVoted = false;
+        
+        // Obtener código de sala de la URL ?room=XXXX
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomCode = urlParams.get('room');
+
+        if (!roomCode) {
+            showError("Código de sala no válido. Escanea el QR desde la pantalla principal.");
+            document.getElementById('voting-area').style.display = 'none';
+        } else {
+            // Revisar si la sala está activa en tiempo real
+            db.ref('rooms/' + roomCode + '/active').on('value', (snap) => {
+                if (snap.val() === false) {
+                    showError("¡La votación se ha cerrado!");
+                    document.getElementById('voting-area').style.display = 'none';
+                }
+            });
+        }
+
+        function castVote(opt) {
+            if(hasVoted) return;
+            if(!roomCode) return;
+            hasVoted = true;
+            
+            document.getElementById('voting-area').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+            
+            // Usamos transacción para prevenir colisiones si votan miles simultáneamente
+            const voteRef = db.ref('rooms/' + roomCode + '/votes/' + opt);
+            
+            voteRef.transaction((currentVote) => {
+                return (currentVote || 0) + 1;
+            }, (error, committed, snapshot) => {
+                document.getElementById('loader').style.display = 'none';
+                if (error) {
+                    showError("Hubo un error al registrar el voto.");
+                } else if (!committed) {
+                    showError("No se pudo enviar. Votación cerrada.");
+                } else {
+                    showMsg("¡Votaste por la " + opt + "! Observa la pantalla grande...");
+                }
+            });
+        }
+        
+        function showError(t) {
+            const m = document.getElementById('msg');
+            m.style.background = '#ff4444';
+            m.style.color = 'white';
+            m.innerHTML = t;
+            m.style.display = 'block';
+        }
+        
+        function showMsg(t) {
+            const m = document.getElementById('msg');
+            m.style.background = '#ffd700';
+            m.style.color = 'black';
+            m.innerHTML = t;
+            m.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

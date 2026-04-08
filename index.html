@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>50x15 Bíblico Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Librerías de Firebase y QR para el Público interactivo -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body>
+
+    <div id="screen-home" class="screen">
+        <div class="logo-container">
+            <h1 class="main-title">50 x 15<br><span>BÍBLICO</span></h1>
+        </div>
+        <div class="menu-buttons">
+            <button onclick="startGame()" class="btn-menu pulse"><i class="fas fa-play"></i> NUEVA PARTIDA</button>
+            <button onclick="resumeGame()" class="btn-menu"><i class="fas fa-history"></i> CONTINUAR</button>
+            <button onclick="showScreen('screen-admin')" class="btn-menu"><i class="fas fa-edit"></i> GESTIONAR
+                PREGUNTAS</button>
+        </div>
+    </div>
+
+    <div id="screen-game" class="screen" style="display:none;">
+        <div class="game-layout">
+            <aside class="points-ladder">
+                <ul id="ladder-list"></ul>
+            </aside>
+
+            <main class="main-game-area">
+                <div class="game-header">
+                    <div class="lifelines">
+                        <button id="cmd-50" class="circle-btn" onclick="use50()">
+                            <i class="fa-solid fa-circle-half-stroke"></i>
+                            <span>50:50</span>
+                        </button>
+                        <button id="cmd-phone" class="circle-btn" onclick="usePhone()">
+                            <i class="fas fa-phone"></i>
+                            <span>LLAMAR</span>
+                        </button>
+                        <button id="cmd-people" class="circle-btn" onclick="usePeople()">
+                            <i class="fas fa-users"></i>
+                            <span>PÚBLICO</span>
+                        </button>
+                    </div>
+                    <div id="game-timer">30</div>
+                    <div class="top-controls">
+                        <button class="btn-retire" onclick="retirePlayer()">ME RETIRO</button>
+                        <button class="btn-pause" onclick="pauseAndSave()"><i class="fas fa-pause"></i></button>
+                    </div>
+                </div>
+
+                <div class="question-area">
+                    <div class="diamond-box question">
+                        <h2 id="display-question">¿Cual es el primer libro?</h2>
+                    </div>
+                    <div class="options-container">
+                        <div class="diamond-box option" onclick="checkAnswer(0)"><span>A:</span>
+                            <p id="opt0"></p>
+                        </div>
+                        <div class="diamond-box option" onclick="checkAnswer(1)"><span>B:</span>
+                            <p id="opt1"></p>
+                        </div>
+                        <div class="diamond-box option" onclick="checkAnswer(2)"><span>C:</span>
+                            <p id="opt2"></p>
+                        </div>
+                        <div class="diamond-box option" onclick="checkAnswer(3)"><span>D:</span>
+                            <p id="opt3"></p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div id="phone-overlay" class="overlay" style="display:none;">
+            <div class="phone-card">
+                <i class="fas fa-phone-volume fa-beat"></i>
+                <h2>Llamada en curso...</h2>
+                <div id="phone-timer">30</div>
+                <button class="btn-hangup" onclick="hangUp()">COLGAR</button>
+            </div>
+        </div>
+
+        <div id="pause-overlay" class="overlay" style="display:none;">
+            <div class="pause-card">
+                <i class="fas fa-pause-circle" style="font-size: 4rem; color: var(--gold); margin-bottom: 20px;"></i>
+                <h2 style="color: white; font-size: 2.5rem; margin-bottom: 30px;">JUEGO PAUSADO</h2>
+
+                <div class="pause-options" style="display: flex; flex-direction: column; gap: 15px;">
+                    <button onclick="unpause()" class="btn-menu" style="font-size: 1.5rem;">REANUDAR</button>
+                    <button onclick="saveAndExit()" class="btn-menu" style="font-size: 1.2rem; color: #aaa;">GUARDAR Y
+                        SALIR</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-overlay" class="overlay" style="display:none;">
+            <div class="result-card">
+                <h1 id="result-title">FIN DEL JUEGO</h1>
+                <p id="result-msg"></p>
+                <button onclick="showScreen('screen-home')" class="btn-menu">VOLVER AL INICIO</button>
+            </div>
+        </div>
+
+        <div id="retire-overlay" class="overlay" style="display:none;">
+            <div class="result-card">
+                <i class="fas fa-hand-paper" style="font-size: 4rem; color: var(--gold); margin-bottom: 20px;"></i>
+                <h2 style="color: white; font-size: 2.5rem; margin-bottom: 20px;">¿ESTÁS SEGURO?</h2>
+                <p style="font-size: 1.5rem; margin-bottom: 30px;">¿Quieres retirarte y asegurar <span
+                        id="retire-amount" style="color:var(--gold); font-weight:bold;"></span>?</p>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <button onclick="confirmRetire()" class="btn-menu"
+                        style="font-size: 1.5rem; color: #ff4444; border-color: #ff4444;">SÍ, ME RETIRO</button>
+                    <button onclick="cancelRetire()" class="btn-menu" style="font-size: 1.5rem;">SEGUIR JUGANDO</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="audience-overlay" class="overlay" style="display:none;">
+            <div class="result-card audience-panel" style="width: 800px; display:flex; gap: 30px; text-align:left;">
+                <div style="flex:1;">
+                    <h2 style="color:var(--gold); font-size: 2.5rem; margin-top:0;">EL PÚBLICO VOTA</h2>
+                    <p style="font-size: 1.2rem; color:#ccc;">Voten desde sus teléfonos escaneando este código.</p>
+                    <div id="qrcode" style="background:white; padding:15px; border-radius:10px; display:inline-block; margin-bottom: 20px;"></div>
+                    <h1 id="audience-timer" style="font-size: 4rem; color:var(--blue-bright); margin:0;">40</h1>
+                </div>
+                <div style="flex:2; display:flex; flex-direction:column; justify-content:center; gap: 20px;">
+                    <div class="bar-row">
+                        <span class="bar-label">A</span>
+                        <div class="bar-bg"><div id="bar-A" class="bar-fill" style="width: 0%; background: #ff4444;"></div></div>
+                        <span id="pct-A" class="bar-pct">0%</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label">B</span>
+                        <div class="bar-bg"><div id="bar-B" class="bar-fill" style="width: 0%; background: #4444ff;"></div></div>
+                        <span id="pct-B" class="bar-pct">0%</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label">C</span>
+                        <div class="bar-bg"><div id="bar-C" class="bar-fill" style="width: 0%; background: #ffaa00;"></div></div>
+                        <span id="pct-C" class="bar-pct">0%</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label">D</span>
+                        <div class="bar-bg"><div id="bar-D" class="bar-fill" style="width: 0%; background: #44ff44;"></div></div>
+                        <span id="pct-D" class="bar-pct">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-admin" class="screen" style="display:none; flex-direction: column; overflow-y: auto;">
+        <h2 style="color: var(--gold);"><i class="fas fa-tools"></i> GESTIÓN DE PREGUNTAS</h2>
+
+        <div class="font-control"
+            style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <label>Tamaño de Fuente: </label>
+            <input type="range" id="font-slider" min="1" max="3" step="0.1" value="1.5"
+                oninput="changeFontSize(this.value)">
+            <span id="font-value">1.5rem</span>
+        </div>
+
+        <div class="table-container"
+            style="background: white; border-radius: 10px; padding: 10px; width: 95%; max-height: 50vh; overflow-y: auto;">
+            <table id="questions-table" style="width: 100%; color: black; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #eee;">
+                        <th>Nivel</th>
+                        <th>Pregunta</th>
+                        <th>A</th>
+                        <th>B</th>
+                        <th>C</th>
+                        <th>D</th>
+                        <th>Correcta (0-3)</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-table-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="admin-controls" style="margin-top: 20px;">
+            <button onclick="addNewRow()" class="btn-dev"><i class="fas fa-plus"></i> AÑADIR FILA</button>
+            <button onclick="saveAdminData()" class="btn-dev" style="color: #00ff00; border-color: #00ff00;"><i
+                    class="fas fa-save"></i> GUARDAR EN NAVEGADOR</button>
+            <button onclick="showScreen('screen-home')" class="btn-dev"><i class="fas fa-arrow-left"></i>
+                VOLVER</button>
+        </div>
+
+        <div class="master-control">
+            <h3><i class="fas fa-database"></i> MASTER CONTROL (JSON)</h3>
+            <input type="file" id="import-json" style="display:none" onchange="importJSON(event)">
+            <button onclick="document.getElementById('import-json').click()" class="btn-dev">CARGAR ARCHIVO
+                JSON</button>
+            <button onclick="exportJSON()" class="btn-dev">DESCARGAR RESPALDO</button>
+            <button onclick="clearAllData()" class="btn-dev danger">BORRAR TODO</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,439 @@
+:root {
+    --gold: #ffd700;
+    --blue-dark: #020230;
+    --blue-bright: #0000ff;
+    --game-font-size: 1.5rem;
+    /* Valor por defecto */
+}
+
+body {
+    background: radial-gradient(circle, #05054d 0%, #000 100%);
+    color: white;
+    font-family: 'Arial Black', sans-serif;
+    margin: 0;
+    overflow: hidden;
+}
+
+.screen {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* --- CAJONES (DIAMOND BOXES) --- */
+.diamond-box {
+    background: linear-gradient(180deg, #0b0b5e 0%, #000 100%);
+    border: 2px solid var(--gold);
+    padding: 15px 40px;
+    position: relative;
+    margin: 10px auto;
+    font-size: calc(var(--game-font-size) * 1.2);
+
+    /* ANCHO FIJO: Para que no "bailen" */
+    width: 650px;
+    min-height: 80px;
+
+    /* El clip-path se ajusta al contenido sin deformar los lados si usas flex */
+    clip-path: polygon(5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%, 0% 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.3s;
+    box-sizing: border-box;
+    /* Crucial para el padding */
+}
+
+.diamond-box.question {
+    width: 850px;
+    /* La pregunta es más ancha que las opciones */
+    font-size: 1.8rem;
+    text-align: center;
+}
+
+.options-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: auto;
+    /* Se ajusta a los 650px de los hijos */
+}
+
+.diamond-box.option {
+    font-size: calc(var(--game-font-size) * 1.2);
+}
+
+.diamond-box.option:hover {
+    background: var(--gold);
+    color: black;
+}
+
+/* --- BOTÓN DE PAUSA Y CONTROLES --- */
+.top-controls {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    gap: 15px;
+}
+
+.btn-pause {
+    display: flex !important;
+    /* Forzamos flex */
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(180deg, #444 0%, #000 100%);
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 0;
+    /* Limpiamos padding que descentra el icono */
+}
+
+.btn-pause i {
+    font-size: 1.5rem;
+    color: white;
+    line-height: 1;
+    /* Evita que el icono suba o baje */
+}
+
+/* --- COMODINES --- */
+.circle-btn {
+    background: linear-gradient(180deg, #0b0b5e 0%, #000 100%);
+    border: 3px solid var(--gold);
+    color: white;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin: 5px;
+}
+
+/* ESTADO USADO: Ahora sí se verá apagado */
+.circle-btn.usado {
+    background: #111 !important;
+    border-color: #444 !important;
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+.circle-btn.usado i,
+.circle-btn.usado span {
+    color: #444 !important;
+}
+
+/* --- MENÚ PRINCIPAL (Puro texto dorado) --- */
+.btn-menu {
+    background: transparent !important;
+    border: none !important;
+    color: var(--gold);
+    font-size: 2.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin: 15px;
+    transition: 0.3s;
+    text-shadow: 2px 2px 5px black;
+}
+
+.btn-menu:hover {
+    transform: scale(1.1);
+    text-shadow: 0 0 15px var(--gold);
+}
+
+/* --- ESCALERA --- */
+.points-ladder li {
+    list-style: none;
+    padding: 8px;
+    color: #ff9900;
+    font-size: calc(var(--game-font-size) * 0.7);
+    border-bottom: 1px solid #333;
+}
+
+/* --- CONTENEDOR PRINCIPAL DEL JUEGO --- */
+.game-layout {
+    display: flex;
+    flex-direction: row;
+    /* Fuerza a que se pongan uno a la par del otro */
+    width: 100vw;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    gap: 30px;
+}
+
+/* --- ESCALERA (A LA IZQUIERDA) --- */
+.points-ladder {
+    width: 280px;
+    /* Ancho fijo para que no se mueva */
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid var(--gold);
+    border-radius: 15px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column-reverse;
+    /* El millón arriba */
+    flex-shrink: 0;
+    /* Evita que la escalera se haga pequeña */
+}
+
+/* --- ÁREA DE JUEGO (CENTRO/DERECHA) --- */
+.main-game-area {
+    flex-grow: 1;
+    /* Toma todo el espacio restante */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* Distribuye arriba, centro y abajo */
+    align-items: left;
+    padding-bottom: 50px;
+}
+
+/* Ajuste para que la pregunta y opciones no se peguen */
+.question-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* --- FIX DEL RELOJ --- */
+#game-timer {
+    font-size: 5rem;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    margin: 10px 0;
+}
+
+/* --- FIX DE DIAMANTES (ANCHO FIJO) --- */
+.diamond-box {
+    width: 600px;
+    min-height: 70px;
+    /* ... resto de tu clip-path y estilos ... */
+}
+
+.diamond-box.question {
+    width: 850px;
+}
+
+.overlay {
+    position: fixed;
+    /* Fijo respecto a la ventana del navegador */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.95);
+    /* Casi negro total para enfoque */
+    display: none;
+    /* Se activa con JS */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    /* ¡SUPERIOR A TODO! */
+}
+
+.phone-card,
+.result-card {
+    background: #020230;
+    border: 4px solid var(--gold);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 0 30px var(--gold);
+}
+
+/* Estilo del cronómetro de la llamada */
+#phone-timer {
+    font-size: 5rem;
+    color: var(--gold);
+    margin: 20px 0;
+}
+
+/* --- BOTÓN ME PLANTO (RETIRO) --- */
+.btn-retire {
+    background: linear-gradient(180deg, #8b0000 0%, #000 100%) !important;
+    color: white !important;
+    border: 2px solid var(--gold) !important;
+    padding: 10px 25px;
+    font-family: 'Arial Black', sans-serif;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+    box-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
+    margin-right: 10px;
+}
+
+.btn-retire:hover {
+    background: var(--gold) !important;
+    color: black !important;
+    box-shadow: 0 0 20px var(--gold);
+}
+
+/* --- BOTÓN COLGAR (DENTRO DEL OVERLAY) --- */
+.btn-hangup {
+    background: linear-gradient(180deg, #b22222 0%, #333 100%) !important;
+    color: white !important;
+    border: 3px solid white !important;
+    padding: 15px 40px;
+    font-family: 'Arial Black', sans-serif;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 50px;
+    /* Estilo píldora para que parezca botón de teléfono */
+    margin-top: 25px;
+    transition: 0.3s;
+}
+
+.btn-hangup:hover {
+    transform: scale(1.1);
+    background: #ff0000 !important;
+    box-shadow: 0 0 30px #ff0000;
+}
+
+/* --- ESTILO DE LA TARJETA DE LLAMADA --- */
+.phone-card h2 {
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.fa-phone-volume {
+    color: var(--gold);
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.points-ladder {
+    display: flex;
+    flex-direction: column-reverse;
+    /* ESTO ES CLAVE */
+    justify-content: flex-start;
+    /* ... resto de estilos ... */
+}
+
+.points-ladder li.active {
+    background: var(--gold) !important;
+    color: black !important;
+    font-weight: bold;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px var(--gold);
+}
+
+/* --- ESTILOS DE LA TABLA DE GESTIÓN (RECARGADOS) --- */
+#questions-table {
+    width: 100%;
+    color: black;
+    border-collapse: collapse;
+}
+
+#questions-table input {
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+}
+
+.admin-controls {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+/* --- FIX ESPECÍFICO PARA LA PREGUNTA --- */
+#display-question {
+    /* Usamos la variable del slider */
+    font-size: calc(var(--game-font-size) * 1.2);
+
+    /* Forzamos a que el texto se mantenga centrado y no empuje los lados */
+    margin: 0;
+    padding: 0 10px;
+    text-align: center;
+    line-height: 1.2;
+
+    /* Evitamos que el texto se desborde horizontalmente */
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+/* Aseguramos que el contenedor de la pregunta sea RÍGIDO */
+.diamond-box.question {
+    width: 900px !important;
+    /* Ancho fijo para proyector */
+    min-height: 120px;
+    /* Altura mínima para que no se vea vacío */
+    height: auto;
+    /* Solo crece hacia abajo si el texto es muy largo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- ESTILOS LÓGICA DE PAUSA PROFESIONAL --- */
+.pause-card {
+    background: radial-gradient(circle, #05054d 0%, #000 100%);
+    border: 4px solid var(--gold);
+    padding: 50px;
+    border-radius: 30px;
+    text-align: center;
+    min-width: 400px;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 20px var(--gold);
+}
+
+.pause-options .btn-menu {
+    border: 1px solid var(--gold);
+    padding: 15px;
+    width: 100%;
+}
+
+.pause-options .btn-menu:hover {
+    background: var(--gold);
+    color: black;
+}
+
+/* --- ESTILOS AUDIENCE OVERLAY --- */
+.audience-panel {
+    background: radial-gradient(circle, #020220 0%, #000 100%);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 20px var(--gold);
+}
+.bar-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.bar-label {
+    font-size: 2rem;
+    color: var(--gold);
+    width: 30px;
+    font-weight: bold;
+}
+.bar-bg {
+    flex-grow: 1;
+    background: #222;
+    height: 35px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 2px solid #555;
+}
+.bar-fill {
+    height: 100%;
+    transition: width 0.3s ease-out;
+}
+.bar-pct {
+    font-size: 1.5rem;
+    color: white;
+    width: 60px;
+    text-align: right;
+}
