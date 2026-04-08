@@ -15,6 +15,26 @@ if (typeof firebase !== 'undefined' && !firebase.apps.length) {
 }
 const db = typeof firebase !== 'undefined' ? firebase.database() : null;
 
+// --- AUDIO MANAGER ---
+const bgmPlayer = new Audio();
+bgmPlayer.loop = true;
+const sfxPlayer = new Audio();
+
+function playBGM(src) {
+    if(!src) { bgmPlayer.pause(); return; }
+    if(bgmPlayer.src.includes(encodeURI(src)) && !bgmPlayer.paused) return;
+    bgmPlayer.src = `assets/${src}`;
+    bgmPlayer.play().catch(e=>console.log("Autoplay bloqueado"));
+}
+
+function playSFX(src) {
+    sfxPlayer.src = `assets/${src}`;
+    sfxPlayer.play().catch(e=>console.log("Autoplay bloqueado"));
+}
+
+let pendingAnswerIndex = -1;
+let evaluating = false;
+
 // --- VARIABLES GLOBALES CON FAIL-SAFE ---
 let gameData = [];
 try {
@@ -52,6 +72,11 @@ function showScreen(screenId) {
     const target = document.getElementById(screenId);
     if (target) target.style.display = 'flex';
     if (screenId === 'screen-admin') renderAdminTable();
+
+    // Integración Musical
+    if (screenId === 'screen-home') {
+        playBGM('salvapantallas.mp3');
+    }
 }
 
 // --- LÓGICA DE PAUSA PROFESIONAL ---
@@ -155,6 +180,7 @@ function resetTimer() {
 
 function startGame() {
     if (gameData.length === 0) return alert("Carga preguntas en Gestión primero.");
+    playSFX('cambio de pantalla.mp3');
     document.getElementById('result-overlay').style.display = 'none';
     currentIdx = 0;
     bancoTiempo = 0;
@@ -184,8 +210,22 @@ function startGame() {
 }
 
 function loadQuestion() {
+    pendingAnswerIndex = -1;
+    evaluating = false;
+    document.querySelectorAll('.diamond-box.option').forEach(el => {
+        el.classList.remove('selected', 'correct', 'wrong');
+        el.style.visibility = 'visible';
+    });
+
     const q = sessionQuestions[currentIdx];
     document.getElementById('display-question').innerText = q.pregunta;
+
+    // Música de tensión (Pregunta 15 tiene música especial)
+    if (currentIdx === 14) {
+        playBGM('tension pregunta 15.mp3');
+    } else {
+        playBGM('sonid de preguntas.mp3');
+    }
 
     // Aleatorizar opciones
     const opcionesConIndice = q.opciones.map((opt, i) => ({ texto: opt, idOriginal: i }));
@@ -212,21 +252,45 @@ function loadQuestion() {
 }
 
 function checkAnswer(sel) {
-    if (sel === currentRightAnswerIndex) {
-        clearInterval(timer);
-        currentIdx++;
-        if (currentIdx < sessionQuestions.length) {
-            setTimeout(loadQuestion, 500);
-        } else {
-            showGameOver("¡CAMPEÓN!", "¡Ganaste 1 millón de puntos!");
-        }
-    } else {
-        clearInterval(timer);
-        let s = "$0";
-        if (currentIdx >= 10) s = puntosArr[9];
-        else if (currentIdx >= 5) s = puntosArr[4];
-        showGameOver("INCORRECTA", "Te vas con " + s);
+    if (evaluating) return; // Bloquear si ya estamos calidicando
+    if (timeLeft <= 0) return; 
+
+    if (pendingAnswerIndex !== sel) { // PRIMER CLIC (Seleccionar)
+        document.querySelectorAll('.diamond-box.option').forEach(el => el.classList.remove('selected'));
+        pendingAnswerIndex = sel;
+        document.querySelectorAll('.diamond-box.option')[sel].classList.add('selected');
+        // Suenecito suave opcional
+        return;
     }
+
+    // SEGUNDO CLIC EN LA MISMA (Respuesta Definitiva)
+    evaluating = true;
+    clearInterval(timer); // Pausar reloj principal
+    playBGM(null); // Parar música de fondo
+    playSFX("respuesta definitiva.mp3");
+
+    setTimeout(() => {
+        if (sel === currentRightAnswerIndex) {
+            playSFX("correct.mp3");
+            document.querySelectorAll('.diamond-box.option')[sel].classList.add('correct');
+            currentIdx++;
+            if (currentIdx < sessionQuestions.length) {
+                setTimeout(loadQuestion, 3000); // Dar 3 segundos para celebrar
+            } else {
+                showGameOver("¡CAMPEÓN!", "¡Ganaste 1 millón de puntos!");
+            }
+        } else {
+            playSFX("wrong.mp3");
+            document.querySelectorAll('.diamond-box.option')[sel].classList.add('wrong');
+            document.querySelectorAll('.diamond-box.option')[currentRightAnswerIndex].classList.add('correct');
+            let s = "$0";
+            if (currentIdx >= 10) s = puntosArr[9];
+            else if (currentIdx >= 5) s = puntosArr[4];
+            setTimeout(() => {
+                showGameOver("INCORRECTA", "Te vas con " + s);
+            }, 2000);
+        }
+    }, 4000); // 4 Segundos de mega tensión
 }
 
 function renderLadder() {
@@ -257,8 +321,12 @@ function retirePlayer() {
 
 function confirmRetire() {
     document.getElementById('retire-overlay').style.display = 'none';
+    playBGM(null);
+    playSFX('retirarse.mp3');
     const amount = currentIdx > 0 ? puntosArr[currentIdx - 1] : "$0";
-    showGameOver("TE HAS RETIRADO", "Te llevas a casa " + amount);
+    setTimeout(() => {
+        showGameOver("TE HAS RETIRADO", "Te llevas a casa " + amount);
+    }, 1000);
 }
 
 function cancelRetire() {
@@ -347,6 +415,7 @@ function use50() {
     if (used50) return;
     used50 = true;
     document.getElementById('cmd-50').classList.add('usado');
+    playSFX('50 50.mp3');
     
     // Buscar 2 opciones incorrectas aleatorias
     let incorrects = [];
@@ -373,8 +442,11 @@ function usePhone() {
     // Pausar el reloj principal
     clearInterval(timer);
     
+    playBGM(null);
+    playSFX('llamada.mp3');
+
     document.getElementById('phone-overlay').style.display = 'flex';
-    let phoneTimeLeft = 30;
+    let phoneTimeLeft = 15;
     const phoneTimerDisplay = document.getElementById('phone-timer');
     phoneTimerDisplay.innerText = phoneTimeLeft;
     
@@ -390,6 +462,7 @@ function usePhone() {
 function hangUp() {
     clearInterval(phoneTimerInterval);
     document.getElementById('phone-overlay').style.display = 'none';
+    playBGM(currentIdx === 14 ? 'tension pregunta 15.mp3' : 'sonid de preguntas.mp3');
     resumeTimerAfterPause();
 }
 
@@ -445,7 +518,11 @@ function usePeople() {
         });
     });
     
-    let audienceTimeLeft = 40;
+    // Música del público
+    playBGM(null);
+    playSFX('votacion.mp3');
+    
+    let audienceTimeLeft = 24;
     const audTimerDisplay = document.getElementById('audience-timer');
     audTimerDisplay.innerText = audienceTimeLeft;
     
@@ -457,12 +534,12 @@ function usePeople() {
         audTimerDisplay.innerText = audienceTimeLeft;
         if(audienceTimeLeft <= 0) {
             clearInterval(audInterval);
-            roomRef.update({ active: false }); // Cerrar votación
-            roomRef.child('votes').off(); // Dejar de escuchar
+            if(db) roomRef.update({ active: false });
             setTimeout(() => {
                 document.getElementById('audience-overlay').style.display = 'none';
+                playBGM(currentIdx === 14 ? 'tension pregunta 15.mp3' : 'sonid de preguntas.mp3');
                 resumeTimerAfterPause();
-            }, 6000); // 6 segundos adicionales para asimilar resultados
+            }, 6000); // 6 segundos de análisis final
         }
     }, 1000);
 }
