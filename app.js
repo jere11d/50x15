@@ -479,9 +479,25 @@ function usePeople() {
     // Generar un código de sala aleatorio
     const roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
     
-    // Crear el registro en Firebase
+    // Helper para leer opciones y respetar si el 50:50 ocultó alguna
+    const getOptText = (idx) => {
+        const box = document.querySelectorAll('.diamond-box.option')[idx];
+        return box.style.visibility === 'hidden' ? '' : document.getElementById('opt'+idx).innerText;
+    };
+
+    // Crear el registro en Firebase con la pregunta, opciones y estado
     const roomRef = db.ref('rooms/' + roomCode);
-    roomRef.set({ votes: { A:0, B:0, C:0, D:0 }, active: true });
+    roomRef.set({ 
+        pregunta: document.getElementById('display-question').innerText,
+        opciones: {
+            A: getOptText(0),
+            B: getOptText(1),
+            C: getOptText(2),
+            D: getOptText(3)
+        },
+        votes: { A:0, B:0, C:0, D:0 }, 
+        active: true 
+    });
     
     // Preparar UI
     document.getElementById('audience-overlay').style.display = 'flex';

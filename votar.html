@@ -54,6 +54,25 @@
             showError("Código de sala no válido. Escanea el QR desde la pantalla principal.");
             document.getElementById('voting-area').style.display = 'none';
         } else {
+            // Extraer la pregunta y las opciones para mostrarlas
+            db.ref('rooms/' + roomCode).once('value').then((snap) => {
+                const data = snap.val();
+                if (data && data.opciones) {
+                    if (data.pregunta) {
+                        document.querySelector('h1').innerText = data.pregunta;
+                    }
+                    ['A','B','C','D'].forEach(opt => {
+                        const btn = document.getElementById('btn-' + opt);
+                        const text = data.opciones[opt];
+                        if (!text || text.trim() === '') {
+                            btn.style.display = 'none'; // Si se usó el comodín 50:50, esta opción viene vacía y se oculta
+                        } else {
+                            btn.innerHTML = `<span style="font-size:1.2rem; opacity:0.8; margin-bottom:5px; display:block;">${opt}</span><span style="font-size:1.8rem;">${text}</span>`;
+                        }
+                    });
+                }
+            });
+
             // Revisar si la sala está activa en tiempo real
             db.ref('rooms/' + roomCode + '/active').on('value', (snap) => {
                 if (snap.val() === false) {
