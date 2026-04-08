@@ -298,6 +298,50 @@ function saveAdminData() {
     } catch (e) { alert("Bloqueado por el navegador."); }
 }
 
+// --- CONTROLES MASTER JSON ---
+function importJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const parsed = JSON.parse(e.target.result);
+            if (Array.isArray(parsed)) {
+                gameData = parsed;
+                saveAdminData();
+                renderAdminTable();
+                alert("¡Base de datos cargada y sincronizada correctamente!");
+            } else {
+                alert("El archivo no tiene el formato correcto.");
+            }
+        } catch (err) {
+            alert("Error al leer el archivo JSON.");
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input
+}
+
+function exportJSON() {
+    if (gameData.length === 0) return alert("No hay datos para exportar.");
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gameData, null, 4));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href",     dataStr);
+    downloadAnchorNode.setAttribute("download", "questions.json");
+    document.body.appendChild(downloadAnchorNode); // Emular clic
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+function clearAllData() {
+    if (confirm("⚠️ ¿ESTÁS SEGURO? Se borrarán TODAS las preguntas de tu juego de manera irreversible.")) {
+        gameData = [];
+        saveAdminData();
+        renderAdminTable();
+        alert("Base de datos borrada limpia.");
+    }
+}
+
 // --- COMODINES ---
 function use50() {
     if (used50) return;
