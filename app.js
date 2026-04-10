@@ -71,7 +71,7 @@ function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
     const target = document.getElementById(screenId);
     if (target) target.style.display = 'flex';
-    if (screenId === 'screen-admin') renderAdminTable();
+    if (screenId === 'screen-admin') { renderAdminTable(); renderThemesList(); }
 
     // Integración Musical
     if (screenId === 'screen-home') {
@@ -378,7 +378,17 @@ function importJSON(event) {
                 gameData = parsed;
                 saveAdminData();
                 renderAdminTable();
-                alert("¡Base de datos cargada y sincronizada correctamente!");
+                
+                // Auto-detectar nombre del tema desde el archivo
+                const fileName = file.name.replace('.json', '');
+                const themeInput = document.getElementById('theme-name');
+                if (themeInput && fileName !== 'questions') {
+                    themeInput.value = fileName;
+                }
+                
+                const totalQ = parsed.length;
+                const levels = [...new Set(parsed.map(q => q.nivel))].sort((a,b) => a-b);
+                alert(`¡Tema cargado! ${totalQ} preguntas en niveles: ${levels.join(', ')}`);
             } else {
                 alert("El archivo no tiene el formato correcto.");
             }
@@ -392,22 +402,148 @@ function importJSON(event) {
 
 function exportJSON() {
     if (gameData.length === 0) return alert("No hay datos para exportar.");
+    const themeName = document.getElementById('theme-name').value.trim() || 'preguntas';
+    const safeFileName = themeName.replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ _-]/g, '').replace(/\s+/g, '_');
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gameData, null, 4));
     const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href",     dataStr);
-    downloadAnchorNode.setAttribute("download", "questions.json");
-    document.body.appendChild(downloadAnchorNode); // Emular clic
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", safeFileName + ".json");
+    document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
 }
 
 function clearAllData() {
-    if (confirm("⚠️ ¿ESTÁS SEGURO? Se borrarán TODAS las preguntas de tu juego de manera irreversible.")) {
+    if (confirm("⚠️ ¿ESTÁS SEGURO? Se borrarán TODAS las preguntas cargadas actualmente.")) {
         gameData = [];
         saveAdminData();
         renderAdminTable();
-        alert("Base de datos borrada limpia.");
+        document.getElementById('theme-name').value = '';
+        alert("Preguntas borradas.");
     }
+}
+
+// --- SISTEMA DE TEMAS ---
+let currentThemeName = '';
+
+function getThemes() {
+    try {
+        const data = localStorage.getItem('biblia_themes');
+        return data ? JSON.parse(data) : {};
+    } catch(e) {
+        return {};
+    }
+}
+
+function saveThemesToStorage(themes) {
+    try {
+        localStorage.setItem('biblia_themes', JSON.stringify(themes));
+    } catch(e) {
+        alert("Error al guardar: almacenamiento lleno o bloqueado.");
+    }
+}
+
+function saveTheme() {
+    const nameInput = document.getElementById('theme-name');
+    const name = nameInput.value.trim();
+    if (!name) return alert("Escribe un nombre para el tema.");
+    if (gameData.length === 0) return alert("No hay preguntas para guardar. Carga o crea preguntas primero.");
+    
+    const themes = getThemes();
+    const exists = themes[name];
+    
+    if (exists && !confirm(`El tema "${name}" ya existe. ¿Quieres sobrescribirlo?`)) return;
+    
+    themes[name] = JSON.parse(JSON.stringify(gameData));
+    saveThemesToStorage(themes);
+    currentThemeName = name;
+    renderThemesList();
+    
+    const totalQ = gameData.length;
+    const levels = [...new Set(gameData.map(q => q.nivel))].sort((a,b) => a-b);
+    alert(`✅ Tema "${name}" guardado (${totalQ} preguntas, niveles: ${levels.join(', ')})`);
+}
+
+function loadTheme(name) {
+    const themes = getThemes();
+    if (!themes[name]) return alert("Tema no encontrado.");
+    
+    gameData = JSON.parse(JSON.stringify(themes[name]));
+    saveAdminData();
+    renderAdminTable();
+    
+    currentThemeName = name;
+    document.getElementById('theme-name').value = name;
+    renderThemesList();
+    
+    const totalQ = gameData.length;
+    alert(`✅ Tema "${name}" cargado (${totalQ} preguntas)`);
+}
+
+function downloadTheme(name) {
+    const themes = getThemes();
+    if (!themes[name]) return alert("Tema no encontrado.");
+    
+    const safeFileName = name.replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ _-]/g, '').replace(/\s+/g, '_');
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(themes[name], null, 4));
+    const a = document.createElement('a');
+    a.setAttribute("href", dataStr);
+    a.setAttribute("download", safeFileName + ".json");
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
+
+function deleteTheme(name) {
+    if (!confirm(`¿Borrar el tema "${name}"? (Solo se borra del navegador, NO afecta las preguntas cargadas actualmente)`)) return;
+    
+    const themes = getThemes();
+    delete themes[name];
+    saveThemesToStorage(themes);
+    renderThemesList();
+}
+
+function renderThemesList() {
+    const container = document.getElementById('themes-list');
+    if (!container) return;
+    
+    const themes = getThemes();
+    const names = Object.keys(themes);
+    
+    if (names.length === 0) {
+        container.innerHTML = '<p style="color:#666; font-style:italic; font-size:0.85rem;">No hay temas guardados. Carga preguntas y guárdalas como tema.</p>';
+        return;
+    }
+    
+    let html = '<div style="display:flex; flex-direction:column; gap:8px;">';
+    names.forEach(name => {
+        const qs = themes[name];
+        const count = qs.length;
+        const levels = [...new Set(qs.map(q => q.nivel))].sort((a,b) => a-b);
+        const isActive = name === currentThemeName;
+        
+        html += `
+        <div style="display:flex; align-items:center; gap:10px; padding:10px 15px; 
+            background:${isActive ? 'rgba(255,215,0,0.15)' : 'rgba(255,255,255,0.05)'}; 
+            border:2px solid ${isActive ? 'var(--gold)' : '#333'}; border-radius:10px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:150px;">
+                <strong style="color:${isActive ? 'var(--gold)' : 'white'}; font-size:1rem;">
+                    ${isActive ? '<i class="fas fa-star" style="margin-right:5px;"></i>' : ''}${name}
+                </strong>
+                <div style="color:#999; font-size:0.75rem; margin-top:3px;">${count} preguntas · Niveles: ${levels.join(', ')}</div>
+            </div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button onclick="loadTheme('${name.replace(/'/g, "\\'")}')" class="btn-dev" style="font-size:0.75rem; padding:5px 10px;">
+                    <i class="fas fa-play"></i> USAR</button>
+                <button onclick="downloadTheme('${name.replace(/'/g, "\\'")}')" class="btn-dev" style="font-size:0.75rem; padding:5px 10px;">
+                    <i class="fas fa-download"></i></button>
+                <button onclick="deleteTheme('${name.replace(/'/g, "\\'")}')" class="btn-dev danger" style="font-size:0.75rem; padding:5px 10px;">
+                    <i class="fas fa-trash"></i></button>
+            </div>
+        </div>`;
+    });
+    html += '</div>';
+    container.innerHTML = html;
 }
 
 // --- COMODINES ---

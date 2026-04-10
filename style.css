@@ -429,6 +429,51 @@ body {
     text-align: right;
 }
 
+/* --- BOTONES DEL PANEL ADMIN --- */
+.btn-dev {
+    background: transparent;
+    border: 2px solid #888;
+    color: #ccc;
+    padding: 8px 15px;
+    font-family: 'Arial Black', sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.btn-dev:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: var(--gold);
+    color: white;
+}
+
+.btn-dev.danger {
+    color: #ff4444;
+    border-color: #ff4444;
+}
+
+.btn-dev.danger:hover {
+    background: rgba(255,0,0,0.15);
+}
+
+/* --- SECCIÓN TEMAS / MASTER CONTROL --- */
+.master-control {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid #333;
+    border-radius: 15px;
+    width: 95%;
+}
+
+.master-control h3 {
+    color: var(--gold);
+    margin-top: 0;
+    font-size: 1.1rem;
+}
+
 /* --- ESTADOS DE RESPUESTA (OPCIONES) --- */
 .diamond-box.option.selected {
     background: #ff8800 !important;

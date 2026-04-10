@@ -197,12 +197,28 @@
         </div>
 
         <div class="master-control">
-            <h3><i class="fas fa-database"></i> MASTER CONTROL (JSON)</h3>
-            <input type="file" id="import-json" style="display:none" onchange="importJSON(event)">
-            <button onclick="document.getElementById('import-json').click()" class="btn-dev">CARGAR ARCHIVO
-                JSON</button>
-            <button onclick="exportJSON()" class="btn-dev">DESCARGAR RESPALDO</button>
-            <button onclick="clearAllData()" class="btn-dev danger">BORRAR TODO</button>
+            <h3><i class="fas fa-palette"></i> TEMAS DE PREGUNTAS</h3>
+            <p style="color:#aaa; font-size:0.85rem; margin-top:0;">Guarda diferentes sets de preguntas como temas y cámbialos cuando quieras.</p>
+            
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:15px;">
+                <input type="text" id="theme-name" placeholder="Nombre del tema (ej: Antiguo Testamento)" 
+                    style="flex:1; min-width:200px; padding:10px; border-radius:8px; border:2px solid var(--gold); background:#111; color:white; font-size:1rem;">
+                <button onclick="saveTheme()" class="btn-dev" style="color:#00ff00; border-color:#00ff00;">
+                    <i class="fas fa-save"></i> GUARDAR TEMA</button>
+            </div>
+
+            <div id="themes-list" style="margin-bottom:15px;"></div>
+
+            <h3 style="margin-top:20px;"><i class="fas fa-database"></i> ARCHIVOS JSON</h3>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="file" id="import-json" style="display:none" onchange="importJSON(event)" accept=".json">
+                <button onclick="document.getElementById('import-json').click()" class="btn-dev">
+                    <i class="fas fa-upload"></i> CARGAR DESDE ARCHIVO</button>
+                <button onclick="exportJSON()" class="btn-dev">
+                    <i class="fas fa-download"></i> DESCARGAR ACTUAL</button>
+                <button onclick="clearAllData()" class="btn-dev danger">
+                    <i class="fas fa-trash"></i> BORRAR TODO</button>
+            </div>
         </div>
     </div>
 
