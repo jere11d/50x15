@@ -43,6 +43,14 @@ function showScreen(screenId) {
     if (target) target.style.display = 'flex';
     if (screenId === 'screen-admin') { renderAdminTable(); renderThemesList(); }
 
+    // Cerrar overlays del juego al salir
+    if (screenId !== 'screen-game') {
+        ['phone-overlay','pause-overlay','result-overlay','retire-overlay','audience-overlay'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+    }
+
     // Manejar el fondo del body: launcher vs juegos
     const toggle = document.querySelector('.theme-toggle');
     const backBtn = document.getElementById('btn-back-center');
@@ -51,23 +59,32 @@ function showScreen(screenId) {
         document.body.classList.add('launcher-active');
         if (toggle) toggle.style.display = 'flex';
         if (backBtn) backBtn.style.display = 'none';
+        // Forzar parar todo audio del juego
+        sfxPlayer.pause();
+        sfxPlayer.currentTime = 0;
         playBGM('salvapantallas.mp3');
     } else {
         document.body.classList.remove('launcher-active');
         if (toggle) toggle.style.display = 'none';
         if (backBtn) backBtn.style.display = 'flex';
         if (screenId === 'screen-home') {
+            sfxPlayer.pause();
+            sfxPlayer.currentTime = 0;
             playBGM('salvapantallas.mp3');
         }
     }
 }
 
 function goToLauncher() {
-    // Si hay un juego en curso, preguntar
-    if (document.getElementById('screen-game').style.display === 'flex') {
+    // Si hay un juego activo (no en overlay de resultado), preguntar
+    const gameVisible = document.getElementById('screen-game').style.display === 'flex';
+    const resultVisible = document.getElementById('result-overlay').style.display === 'flex';
+    
+    if (gameVisible && !resultVisible) {
         if (!confirm('¿Salir del juego? El progreso no guardado se perderá.')) return;
         clearInterval(timer);
     }
+    playBGM(null); // Detener cualquier música de juego
     showScreen('screen-launcher');
 }
 
