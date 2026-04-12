@@ -214,3 +214,178 @@ function renderThemesList() {
     html += '</div>';
     container.innerHTML = html;
 }
+
+// ============================================================
+// ADMIN.JS — Lógica para "Quién Soy"
+// ============================================================
+
+// --- NAVEGACIÓN TABS ---
+function switchAdminTab(tabName) {
+    if (tabName === '50x15') {
+        document.getElementById('admin-50x15-section').style.display = 'flex';
+        document.getElementById('admin-who-section').style.display = 'none';
+        document.getElementById('tab-50x15').style.opacity = '1';
+        document.getElementById('tab-50x15').classList.add('pulse');
+        document.getElementById('tab-who').style.opacity = '0.5';
+        document.getElementById('tab-who').classList.remove('pulse');
+        renderAdminTable();
+    } else {
+        document.getElementById('admin-50x15-section').style.display = 'none';
+        document.getElementById('admin-who-section').style.display = 'flex';
+        document.getElementById('tab-who').style.opacity = '1';
+        document.getElementById('tab-who').classList.add('pulse');
+        document.getElementById('tab-50x15').style.opacity = '0.5';
+        document.getElementById('tab-50x15').classList.remove('pulse');
+        renderWhoAdminTable();
+    }
+}
+
+// --- LOGICA DE TABLA QUIEN SOY ---
+function renderWhoAdminTable() {
+    const tbody = document.getElementById('admin-who-idbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    
+    // Si no está cargado whoData desde game-who.js, aseguremos que exista
+    if (typeof whoData === 'undefined') window.whoData = [];
+    
+    whoData.forEach((char, i) => {
+        const tr = document.createElement('tr');
+        if(!char.imagenes) char.imagenes = ["","","",""];
+        
+        let imgHtml = '';
+        for(let j=0; j<4; j++){
+            const hasImg = char.imagenes[j] && (char.imagenes[j].startsWith('data:image') || char.imagenes[j].startsWith('http') || char.imagenes[j].startsWith('assets'));
+            const bg = hasImg ? 'background: #28a745;' : 'background: #444;';
+            imgHtml += `
+            <div style="display:inline-block; margin:2px; text-align:center;">
+                <label style="cursor:pointer; display:inline-block; padding:5px; border-radius:5px; ${bg} color:white; font-size:0.8rem;" title="Subir Imagen ${j+1}">
+                    <i class="fas fa-image"></i> ${j+1}
+                    <input type="file" accept="image/*" style="display:none;" onchange="uploadWhoImage(event, ${i}, ${j})">
+                </label>
+                ${hasImg ? `<br><img src="${char.imagenes[j]}" style="width:30px; height:30px; object-fit:cover; margin-top:2px; border-radius:3px;">` : ''}
+            </div>`;
+        }
+        
+        tr.innerHTML = `
+            <td><input type="text" value="${char.nombre || ''}" onchange="updateWhoData(${i}, 'nombre', this.value)" placeholder="Nombre del Personaje"></td>
+            <td><input type="text" value="${char.info || ''}" onchange="updateWhoData(${i}, 'info', this.value)" placeholder="Dato curioso/Info"></td>
+            <td>${imgHtml}</td>
+            <td><button onclick="removeWhoRow(${i})" style="color:red" class="btn-dev danger">X</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function updateWhoData(i, k, v) { whoData[i][k] = v; saveWhoAdminData(true); }
+function addNewWhoRow() {
+    whoData.push({ nombre: "", info: "", imagenes: ["", "", "", ""] });
+    renderWhoAdminTable();
+}
+function removeWhoRow(i) {
+    if(confirm("¿Borrar este personaje?")) {
+        whoData.splice(i, 1);
+        saveWhoAdminData(true);
+        renderWhoAdminTable();
+    }
+}
+
+// --- SISTEMA DE COMPRESIÓN DE IMÁGENES (CANVAS) ---
+function uploadWhoImage(event, charIndex, imgIndex) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            // Comprimir la imagen usando un canvas
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 600;
+            const MAX_HEIGHT = 600;
+            let width = img.width;
+            let height = img.height;
+            
+            if (width > height) {
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+            } else {
+                if (height > MAX_HEIGHT) {
+                    width *= MAX_HEIGHT / height;
+                    height = MAX_HEIGHT;
+                }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Exportar como JPG ligero (0.7 calidad) para que ahorre peso
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+            
+            // Guardar en el array
+            whoData[charIndex].imagenes[imgIndex] = dataUrl;
+            renderWhoAdminTable();
+            
+            // Auto-guardado
+            saveWhoAdminData(true);
+        }
+        img.src = e.target.result;
+    }
+    reader.readAsDataURL(file);
+}
+
+// --- GUARDAR / EXPORTAR ---
+function saveWhoAdminData(silent) {
+    try {
+        localStorage.setItem('biblia_who_characters', JSON.stringify(whoData));
+        if (!silent) alert("Personajes e imágenes guardados en el navegador.");
+    } catch(e) {
+        alert("Error al guardar. Puede que las imágenes sean muy pesadas y llenaron la memoria. Borra algunos personajes o usa EXPORTAR JSON.");
+    }
+}
+
+function exportWhoJSON() {
+    if (!whoData || whoData.length === 0) return alert("No hay datos para exportar.");
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(whoData, null, 4));
+    const a = document.createElement('a');
+    a.setAttribute("href", dataStr);
+    a.setAttribute("download", "quien_soy_personajes.json");
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
+
+function importWhoJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const parsed = JSON.parse(e.target.result);
+            if (Array.isArray(parsed)) {
+                whoData = parsed;
+                saveWhoAdminData(true);
+                renderWhoAdminTable();
+                alert(`¡Archivo cargado! ${parsed.length} personajes listos.`);
+            } else {
+                alert("El archivo no tiene el formato correcto.");
+            }
+        } catch (err) {
+            alert("Error al leer el archivo JSON.");
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+function clearAllWhoData() {
+    if(confirm("⚠️ ¿ESTÁS SEGURO? Se borrarán todos los personajes de Quién Soy.")) {
+        whoData = [];
+        saveWhoAdminData(true);
+        renderWhoAdminTable();
+    }
+}

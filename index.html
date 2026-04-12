@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/shared.css">
     <link rel="stylesheet" href="css/launcher.css">
     <link rel="stylesheet" href="css/game-50x15.css">
+    <link rel="stylesheet" href="css/game-who.css">
     <link rel="stylesheet" href="css/admin.css">
 
     <!-- Librerías de Firebase y QR para el Público interactivo -->
@@ -37,11 +38,10 @@
                 <h3>50 x 15</h3>
                 <p>El clásico camino al millón.</p>
             </div>
-            <div class="game-card locked" onclick="showComingSoon('¿QUIÉN SOY?')">
+            <div class="game-card" onclick="startWhoAmI()">
                 <div class="card-icon"><i class="fas fa-user-secret"></i></div>
                 <h3>¿Quién Soy?</h3>
                 <p>Adivina el personaje bíblico con pistas.</p>
-                <span class="badge-soon">PRÓXIMAMENTE</span>
             </div>
             <div class="game-card locked" onclick="showComingSoon('MELODÍA BÍBLICA')">
                 <div class="card-icon"><i class="fas fa-music"></i></div>
@@ -50,6 +50,31 @@
                 <span class="badge-soon">PRÓXIMAMENTE</span>
             </div>
         </div>
+
+    <!-- PANTALLA: JUEGO ¿QUIÉN SOY? -->
+    <div id="screen-who" class="screen" style="display:none;">
+        <div class="who-container">
+            <div class="who-header">
+                <h1>¿QUIÉN SOY?</h1>
+                <div class="points-badge">
+                    PREMIO: <span id="clue-points-display">100</span> PTS
+                </div>
+                <h2 id="who-character-name" style="color:white; font-size: 3rem; margin-top:20px; display:none;">Nombre del Personaje</h2>
+            </div>
+    
+            <div class="image-grid-who">
+                <div id="slot-0" class="img-slot locked"><i class="fas fa-lock"></i></div>
+                <div id="slot-1" class="img-slot locked"><i class="fas fa-lock"></i></div>
+                <div id="slot-2" class="img-slot locked"><i class="fas fa-lock"></i></div>
+                <div id="slot-3" class="img-slot locked"><i class="fas fa-lock"></i></div>
+            </div>
+    
+            <div class="who-controls">
+                <button onclick="revealNextClue()" class="btn-menu pulse">REVELAR PISTA</button>
+                <button onclick="showWhoAnswer()" class="btn-menu" style="color: var(--sunset);">REVELAR PERSONAJE</button>
+            </div>
+        </div>
+    </div>
     </div>
 
     <!-- MENÚ DE 50x15 -->
@@ -205,7 +230,17 @@
     </div>
 
     <div id="screen-admin" class="screen" style="display:none; flex-direction: column; overflow-y: auto;">
-        <h2 style="color: var(--gold);"><i class="fas fa-tools"></i> GESTIÓN DE PREGUNTAS</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 95%; margin-bottom: 10px;">
+            <h2 style="color: var(--gold); margin:0;"><i class="fas fa-tools"></i> GESTIÓN DE PREGUNTAS</h2>
+            <div>
+                <button onclick="switchAdminTab('50x15')" id="tab-50x15" class="btn-menu pulse" style="font-size: 1rem; padding: 5px 15px; border:2px solid var(--gold); border-radius:10px;">50 x 15</button>
+                <button onclick="switchAdminTab('who')" id="tab-who" class="btn-menu" style="font-size: 1rem; padding: 5px 15px; opacity:0.5;">¿QUIÉN SOY?</button>
+                <button onclick="showScreen('screen-launcher')" class="btn-menu" style="font-size: 1rem; padding: 5px 15px;"><i class="fas fa-arrow-left"></i> SALIR</button>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 50x15 -->
+        <div id="admin-50x15-section" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
 
         <div class="font-control"
             style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
@@ -239,7 +274,7 @@
             <button onclick="addNewRow()" class="btn-dev"><i class="fas fa-plus"></i> AÑADIR FILA</button>
             <button onclick="saveAdminData()" class="btn-dev" style="color: #00ff00; border-color: #00ff00;"><i
                     class="fas fa-save"></i> GUARDAR EN NAVEGADOR</button>
-            <button onclick="showScreen('screen-home')" class="btn-dev"><i class="fas fa-arrow-left"></i> VOLVER A
+            <button onclick="showScreen('screen-home')" class="btn-dev"><i class="fas fa-play"></i> IR A JUEGO
                 50x15</button>
         </div>
 
@@ -268,10 +303,41 @@
                     <i class="fas fa-trash"></i> BORRAR TODO</button>
             </div>
         </div>
+        </div>
+
+        <!-- SECCIÓN ¿QUIÉN SOY? -->
+        <div id="admin-who-section" style="width: 100%; display: none; flex-direction: column; align-items: center;">
+            <div class="table-container" style="background: white; border-radius: 10px; padding: 10px; width: 95%; max-height: 50vh; overflow-y: auto;">
+                <table id="who-table" style="width: 100%; color: black; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #eee;">
+                            <th>Personaje</th>
+                            <th>Info</th>
+                            <th>Añadir Imagen 1, 2, 3, 4</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-who-idbody">
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="admin-controls" style="margin-top: 20px;">
+                <button onclick="addNewWhoRow()" class="btn-dev"><i class="fas fa-plus"></i> AÑADIR PERSONAJE</button>
+                <button onclick="saveWhoAdminData()" class="btn-dev" style="color: #00ff00; border-color: #00ff00;"><i class="fas fa-save"></i> GUARDAR EN NAVEGADOR</button>
+                <button onclick="document.getElementById('import-who-json').click()" class="btn-dev"><i class="fas fa-upload"></i> IMPORTAR JSON</button>
+                <button onclick="exportWhoJSON()" class="btn-dev"><i class="fas fa-download"></i> EXPORTAR JSON</button>
+                <button onclick="clearAllWhoData()" class="btn-dev danger"><i class="fas fa-trash"></i> BORRAR TODO</button>
+                <button onclick="startWhoAmI()" class="btn-menu"><i class="fas fa-play"></i> IR A JUEGO</button>
+                <input type="file" id="import-who-json" style="display:none" onchange="importWhoJSON(event)" accept=".json">
+            </div>
+        </div>
+
     </div>
 
     <script src="js/shared.js"></script>
     <script src="js/game-50x15.js"></script>
+    <script src="js/game-who.js"></script>
     <script src="js/admin.js"></script>
 </body>
 

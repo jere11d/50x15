@@ -60,7 +60,11 @@ function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
     const target = document.getElementById(screenId);
     if (target) target.style.display = 'flex';
-    if (screenId === 'screen-admin') { renderAdminTable(); renderThemesList(); }
+    if (screenId === 'screen-admin') { 
+        renderAdminTable(); 
+        renderThemesList(); 
+        if (typeof renderWhoAdminTable === 'function') renderWhoAdminTable();
+    }
 
     // Cerrar overlays del juego al salir
     if (screenId !== 'screen-game') {
@@ -93,13 +97,17 @@ function showScreen(screenId) {
 
 function goToLauncher() {
     // Si hay un juego activo (no en overlay de resultado), preguntar
-    const gameVisible = document.getElementById('screen-game').style.display === 'flex';
+    const game50Visible = document.getElementById('screen-game').style.display === 'flex';
     const resultVisible = document.getElementById('result-overlay').style.display === 'flex';
+    const whoVisible = document.getElementById('screen-who').style.display === 'flex';
     
-    if (gameVisible && !resultVisible) {
-        if (!confirm('¿Salir del juego? El progreso no guardado se perderá.')) return;
-        clearInterval(timer);
+    if (game50Visible && !resultVisible) {
+        if (!confirm('¿Salir de 50x15? El progreso no guardado se perderá.')) return;
+        if(typeof timer !== 'undefined') clearInterval(timer);
+    } else if (whoVisible && (typeof isWhoGameOver !== 'undefined' && !isWhoGameOver)) {
+        if (!confirm('¿Salir de ¿Quién Soy?? El juego actual se perderá.')) return;
     }
+    
     playBGM(null); // Detener cualquier música de juego
     showScreen('screen-launcher');
 }
