@@ -221,7 +221,9 @@ function renderThemesList() {
 
 // --- NAVEGACIÓN TABS ---
 function switchAdminTab(tabName) {
+    const adminScreen = document.getElementById('screen-admin');
     if (tabName === '50x15') {
+        adminScreen.classList.remove('admin-who-theme');
         document.getElementById('admin-50x15-section').style.display = 'flex';
         document.getElementById('admin-who-section').style.display = 'none';
         document.getElementById('tab-50x15').style.opacity = '1';
@@ -230,6 +232,7 @@ function switchAdminTab(tabName) {
         document.getElementById('tab-who').classList.remove('pulse');
         renderAdminTable();
     } else {
+        adminScreen.classList.add('admin-who-theme');
         document.getElementById('admin-50x15-section').style.display = 'none';
         document.getElementById('admin-who-section').style.display = 'flex';
         document.getElementById('tab-who').style.opacity = '1';

@@ -193,3 +193,76 @@
         padding: 12px 20px;
     }
 }
+
+/* ============================================================
+   TEMA ADMIN "QUIÉN SOY"
+   ============================================================ */
+#screen-admin.admin-who-theme {
+    background: radial-gradient(circle, var(--warm-bg-radial) 0%, #000 100%) !important;
+    font-family: 'Segoe UI', Roboto, Helvetica, sans-serif !important;
+}
+
+#screen-admin.admin-who-theme h2 {
+    color: var(--sunset) !important;
+}
+
+#screen-admin.admin-who-theme #tab-who {
+    border-color: var(--sunset) !important;
+    color: var(--sunset) !important;
+}
+
+#screen-admin.admin-who-theme #tab-50x15 {
+    border-color: #555 !important;
+    color: #ccc !important;
+}
+
+#screen-admin.admin-who-theme .btn-dev {
+    font-family: 'Segoe UI', sans-serif !important;
+    border-color: #555;
+    color: #ddd;
+    border-radius: 5px;
+    text-shadow: none;
+}
+
+#screen-admin.admin-who-theme .btn-dev:hover {
+    background: var(--sunset);
+    color: white !important;
+    border-color: var(--sunset) !important;
+}
+
+/* El botón de guardar que tenía color verde fijo por línea en HTML */
+#screen-admin.admin-who-theme .btn-dev[style*="00ff00"] {
+    color: var(--amber-glow) !important;
+    border-color: var(--amber-glow) !important;
+}
+
+#screen-admin.admin-who-theme .btn-dev[style*="00ff00"]:hover {
+    background: var(--amber-glow) !important;
+    color: black !important;
+}
+
+#screen-admin.admin-who-theme .btn-dev.danger {
+    color: #ff4444 !important;
+    border-color: #ff4444 !important;
+}
+#screen-admin.admin-who-theme .btn-dev.danger:hover {
+    background: #ff4444 !important;
+    color: white !important;
+}
+
+#screen-admin.admin-who-theme th {
+    background: #441100 !important;
+    color: var(--gold) !important;
+}
+
+#screen-admin.admin-who-theme td {
+    background: #110500 !important;
+    color: white !important;
+}
+
+#screen-admin.admin-who-theme input[type="text"] {
+    background: #2a1100;
+    color: white;
+    border: 1px solid var(--sunset);
+    border-radius: 4px;
+}
