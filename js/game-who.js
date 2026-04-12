@@ -46,6 +46,7 @@ function startWhoAmI() {
 
     saveWhoState();
     showScreen('screen-who');
+    playBGM(null); // Detener salva pantallas
     playSFX('cambio de pantalla.mp3');
 }
 
@@ -100,6 +101,7 @@ function resumeWhoAmI() {
         }
 
         showScreen('screen-who');
+        playBGM(null); // Detener salva pantallas
         
     } catch(e) {
         alert("No se pudo cargar la partida guardada.");
