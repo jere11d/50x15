@@ -55,7 +55,7 @@
     <div id="screen-who" class="screen" style="display:none;">
         <div class="who-container">
             <div class="who-header">
-                <h1>¿QUIÉN SOY?</h1>
+                <h1 class="who-title">¿QUIÉN<span>SOY?</span></h1>
                 <div class="points-badge">
                     PREMIO: <span id="clue-points-display">100</span> PTS
                 </div>
@@ -70,8 +70,8 @@
             </div>
     
             <div class="who-controls">
-                <button onclick="revealNextClue()" class="btn-menu pulse">REVELAR PISTA</button>
-                <button onclick="showWhoAnswer()" class="btn-menu" style="color: var(--sunset);">REVELAR PERSONAJE</button>
+                <button onclick="revealNextClue()" class="btn-who pulse">REVELAR PISTA</button>
+                <button onclick="showWhoAnswer()" class="btn-who btn-who-outline">REVELAR PERSONAJE</button>
             </div>
         </div>
     </div>
@@ -80,12 +80,12 @@
     <!-- MENÚ DE QUIÉN SOY -->
     <div id="screen-who-home" class="screen" style="display:none; background: radial-gradient(circle, #1a0f00 0%, #000 100%);">
         <div class="logo-container">
-            <h1 class="main-title" style="color: #ffd700; text-shadow: 0 0 15px #ff9900;">¿QUIÉN<br><span>SOY?</span></h1>
+            <h1 class="who-title">¿QUIÉN<br><span>SOY?</span></h1>
         </div>
         <div class="menu-buttons">
-            <button onclick="startWhoAmI()" class="btn-menu pulse"><i class="fas fa-play"></i> NUEVA PARTIDA</button>
-            <button onclick="resumeWhoAmI()" class="btn-menu"><i class="fas fa-history"></i> CONTINUAR</button>
-            <button onclick="switchAdminTab('who'); showScreen('screen-admin');" class="btn-menu"><i class="fas fa-edit"></i> GESTIONAR PERSONAJES</button>
+            <button onclick="startWhoAmI()" class="btn-who pulse"><i class="fas fa-play"></i> NUEVA PARTIDA</button>
+            <button onclick="resumeWhoAmI()" class="btn-who"><i class="fas fa-history"></i> CONTINUAR</button>
+            <button onclick="switchAdminTab('who'); showScreen('screen-admin');" class="btn-who"><i class="fas fa-edit"></i> GESTIONAR PERSONAJES</button>
         </div>
     </div>
 
