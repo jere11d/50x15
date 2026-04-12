@@ -28,10 +28,10 @@ function updateOpt(i, oi, v) { gameData[i].opciones[oi] = v; }
 function addNewRow() { gameData.push({ nivel: 1, pregunta: "", opciones: ["", "", "", ""], correcta: 0 }); renderAdminTable(); }
 function removeRow(i) { gameData.splice(i, 1); renderAdminTable(); }
 
-function saveAdminData() {
+function saveAdminData(silent) {
     try {
         localStorage.setItem('biblia_questions', JSON.stringify(gameData));
-        alert("Preguntas guardadas.");
+        if (!silent) alert("Preguntas guardadas.");
     } catch (e) { alert("Bloqueado por el navegador."); }
 }
 
@@ -45,7 +45,7 @@ function importJSON(event) {
             const parsed = JSON.parse(e.target.result);
             if (Array.isArray(parsed)) {
                 gameData = parsed;
-                saveAdminData();
+                saveAdminData(true);
                 renderAdminTable();
                 
                 const fileName = file.name.replace('.json', '');
@@ -84,15 +84,21 @@ function exportJSON() {
 function clearAllData() {
     if (confirm("⚠️ ¿ESTÁS SEGURO? Se borrarán TODAS las preguntas cargadas actualmente.")) {
         gameData = [];
-        saveAdminData();
+        saveAdminData(true);
         renderAdminTable();
         document.getElementById('theme-name').value = '';
+        currentThemeName = '';
+        try { localStorage.removeItem('biblia_active_theme'); } catch(e) {}
         alert("Preguntas borradas.");
     }
 }
 
 // --- SISTEMA DE TEMAS ---
 let currentThemeName = '';
+try {
+    const savedTheme = localStorage.getItem('biblia_active_theme');
+    if (savedTheme) currentThemeName = savedTheme;
+} catch(e) {}
 
 function getThemes() {
     try {
@@ -121,6 +127,7 @@ function saveTheme() {
     themes[name] = JSON.parse(JSON.stringify(gameData));
     saveThemesToStorage(themes);
     currentThemeName = name;
+    try { localStorage.setItem('biblia_active_theme', name); } catch(e) {}
     renderThemesList();
     
     const totalQ = gameData.length;
@@ -133,9 +140,10 @@ function loadTheme(name) {
     if (!themes[name]) return alert("Tema no encontrado.");
     
     gameData = JSON.parse(JSON.stringify(themes[name]));
-    saveAdminData();
+    saveAdminData(true);
     renderAdminTable();
     currentThemeName = name;
+    try { localStorage.setItem('biblia_active_theme', name); } catch(e) {}
     document.getElementById('theme-name').value = name;
     renderThemesList();
     
