@@ -83,13 +83,16 @@ function showScreen(screenId) {
         if (toggle) toggle.style.display = 'flex';
         if (backBtn) backBtn.style.display = 'none';
         stopAllAudio();
-        playBGM('salvapantallas.mp3');
+        // El launcher ahora es silencioso
     } else {
         document.body.classList.remove('launcher-active');
         if (toggle) toggle.style.display = 'none';
         if (backBtn) backBtn.style.display = 'flex';
-        if (screenId === 'screen-home' || screenId === 'screen-who-home') {
-            stopAllAudio();
+        
+        stopAllAudio(); // Detiene cualquier audio anterior
+        
+        if (screenId === 'screen-home') {
+            // Solo 50x15 usa esta música
             playBGM('salvapantallas.mp3');
         }
     }
