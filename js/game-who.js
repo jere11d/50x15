@@ -47,7 +47,6 @@ function startWhoAmI() {
     saveWhoState();
     showScreen('screen-who');
     playSFX('cambio de pantalla.mp3');
-    setTimeout(() => { playBGM('tension pregunta 15.mp3'); }, 1000);
 }
 
 function resumeWhoAmI() {
@@ -102,11 +101,6 @@ function resumeWhoAmI() {
 
         showScreen('screen-who');
         
-        if (!isWhoGameOver) {
-            playBGM('tension pregunta 15.mp3');
-        } else {
-            playBGM(null);
-        }
     } catch(e) {
         alert("No se pudo cargar la partida guardada.");
     }
