@@ -1,6 +1,6 @@
 # 50x15 Bíblico Pro — Contexto Completo del Proyecto
 
-> Documento de contexto para asistentes de IA. Última actualización: 10 de abril de 2026.
+> Documento de contexto para asistentes de IA. Última actualización: 10 de abril de 2026 (v2 — responsive + temas).
 
 ---
 
@@ -70,8 +70,9 @@ const firebaseConfig = {
 - Firebase se usa ÚNICAMENTE para la funcionalidad de votación del público
 
 ### Almacenamiento Local
-- `localStorage['biblia_questions']` — Base de datos de preguntas del juego
+- `localStorage['biblia_questions']` — Base de datos de preguntas activas del juego
 - `localStorage['biblia_save']` — Estado guardado de partida pausada
+- `localStorage['biblia_themes']` — Diccionario de temas guardados `{nombre: preguntas[]}`
 
 ---
 
@@ -141,10 +142,30 @@ const firebaseConfig = {
 - Tabla editable inline con columnas: Nivel, Pregunta, A, B, C, D, Correcta, Acción
 - Slider de tamaño de fuente (variable CSS `--game-font-size`)
 - "GUARDAR EN NAVEGADOR" → localStorage
-- Master Control:
-  - Importar JSON desde archivo
-  - Exportar JSON como respaldo descargable
+- Archivos JSON:
+  - Importar JSON desde archivo (auto-detecta nombre del tema del filename)
+  - Descargar JSON actual (usa nombre del tema como filename)
   - Borrar todo (con confirmación)
+
+### 9. Sistema de Temas
+- Permite guardar múltiples sets de preguntas con nombre en el navegador
+- Cada tema almacena un array completo de preguntas con sus niveles
+- Funciones disponibles:
+  - **Guardar Tema** — Guarda las preguntas actuales bajo un nombre
+  - **Usar Tema** — Carga un tema guardado como preguntas activas
+  - **Descargar Tema** — Exporta un tema como archivo `.json` individual
+  - **Eliminar Tema** — Borra un tema del navegador
+- Almacenamiento: `localStorage['biblia_themes']` como `{nombre: preguntas[]}`
+- El tema activo se resalta con borde dorado y estrella ⭐
+- Al importar un JSON, auto-detecta el nombre del archivo como nombre de tema
+
+### 10. Diseño Responsive
+- Todos los anchos cambiaron de pixeles fijos a `clamp()` y `max-width` fluido
+- Media queries en 3 breakpoints: 1200px, 1024px, 768px
+- La escalera de premios se hace más estrecha en pantallas chicas
+- En tablets (<768px) la escalera se vuelve horizontal arriba
+- Textos usan `clamp()` para escalado automático
+- Meta viewport tag en index.html
 
 ---
 
@@ -180,8 +201,8 @@ const firebaseConfig = {
 - Fondo: `radial-gradient(circle, #05054d, #000)`
 - Fuente principal: `'Arial Black', sans-serif`
 - Cajas de pregunta/opciones: Forma de diamante con `clip-path: polygon(...)`
-- Ancho fijo de opciones: 600-650px, pregunta: 900px
-- Escalera de premios a la izquierda (column-reverse = millón arriba)
+- Ancho responsive: opciones `max-width: 600px`, pregunta `max-width: 900px` (ambos `width: 100%`)
+- Escalera de premios a la izquierda (column-reverse = millón arriba), ancho `clamp(150px, 20vw, 280px)`
 - Overlays con fondo `rgba(0,0,0,0.95)` y z-index `9999`
 
 ### Estados de Opciones (CSS)
@@ -218,6 +239,8 @@ const firebaseConfig = {
 10. **Gestión de preguntas** — Import/Export JSON + borrado
 11. **Banda sonora integrada** — 12 archivos MP3 mapeados a eventos del juego
 12. **Doble clic para confirmar** — Mecánica de "respuesta definitiva" con tensión de 4s
+13. **Diseño responsive** — clamp(), media queries, meta viewport para laptops pequeñas
+14. **Sistema de temas** — Guardar/cargar/descargar packs de preguntas con nombre
 
 ---
 
@@ -226,9 +249,8 @@ const firebaseConfig = {
 1. **Carpeta `img/` vacía** — No hay favicon ni imágenes de fondo
 2. **`reloj de pensar pregunta.mp3`** — Existe en assets pero no se usa en el código actual
 3. **Firebase en modo de prueba** — Las reglas expiran en 30 días (reconfigurar si es necesario)
-4. **No hay responsive design completo** — Diseñado principalmente para proyectores/pantallas grandes
-5. **`favicon.ico` faltante** — Error 404 en consola (cosmético)
-6. **Posible leak del `sfxPlayer`** — Si se disparan múltiples SFX rápidamente, solo suena el último
+4. **`favicon.ico` faltante** — Error 404 en consola (cosmético)
+5. **Posible leak del `sfxPlayer`** — Si se disparan múltiples SFX rápidamente, solo suena el último
 
 ---
 
