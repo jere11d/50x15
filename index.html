@@ -4,9 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>50x15 Bíblico Pro</title>
+    <title>Centro de Juegos Bíblicos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/launcher.css">
+    <link rel="stylesheet" href="css/game-50x15.css">
+    <link rel="stylesheet" href="css/admin.css">
 
     <!-- Librerías de Firebase y QR para el Público interactivo -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -14,9 +17,43 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
-<body>
+<body class="launcher-active" data-theme="dark">
 
-    <div id="screen-home" class="screen">
+    <!-- BOTÓN FLOTANTE: VOLVER AL CENTRO -->
+    <button id="btn-back-center" class="btn-back-to-center" onclick="goToLauncher()" title="Volver al Centro de Juegos"
+        style="display:none;">
+        <i class="fas fa-right-from-bracket"></i>
+    </button>
+
+    <!-- PANTALLA PRINCIPAL: CENTRO DE JUEGOS -->
+    <div id="screen-launcher" class="screen launcher-screen">
+        <button class="theme-toggle" onclick="toggleLauncherTheme()" title="Cambiar modo">
+            <i id="theme-icon" class="fas fa-moon"></i>
+        </button>
+        <h1 class="launcher-title">Centro de Juegos<br><span>Bíblicos</span></h1>
+        <div class="gallery-container">
+            <div class="game-card" onclick="showScreen('screen-home')">
+                <div class="card-icon"><i class="fas fa-trophy"></i></div>
+                <h3>50 x 15</h3>
+                <p>El clásico camino al millón.</p>
+            </div>
+            <div class="game-card locked" onclick="showComingSoon('¿QUIÉN SOY?')">
+                <div class="card-icon"><i class="fas fa-user-secret"></i></div>
+                <h3>¿Quién Soy?</h3>
+                <p>Adivina el personaje bíblico con pistas.</p>
+                <span class="badge-soon">PRÓXIMAMENTE</span>
+            </div>
+            <div class="game-card locked" onclick="showComingSoon('MELODÍA BÍBLICA')">
+                <div class="card-icon"><i class="fas fa-music"></i></div>
+                <h3>Melodía Bíblica</h3>
+                <p>Reconoce la pista musical.</p>
+                <span class="badge-soon">PRÓXIMAMENTE</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MENÚ DE 50x15 -->
+    <div id="screen-home" class="screen" style="display:none;">
         <div class="logo-container">
             <h1 class="main-title">50 x 15<br><span>BÍBLICO</span></h1>
         </div>
@@ -105,7 +142,7 @@
             <div class="result-card">
                 <h1 id="result-title">FIN DEL JUEGO</h1>
                 <p id="result-msg"></p>
-                <button onclick="showScreen('screen-home')" class="btn-menu">VOLVER AL INICIO</button>
+                <button onclick="showScreen('screen-launcher')" class="btn-menu">VOLVER AL CENTRO</button>
             </div>
         </div>
 
@@ -128,28 +165,38 @@
                 <div style="flex:1;">
                     <h2 style="color:var(--gold); font-size: 2.5rem; margin-top:0;">EL PÚBLICO VOTA</h2>
                     <p style="font-size: 1.2rem; color:#ccc;">Voten desde sus teléfonos escaneando este código.</p>
-                    <div id="qrcode" style="background:white; padding:15px; border-radius:10px; display:inline-block; margin-bottom: 20px;"></div>
+                    <div id="qrcode"
+                        style="background:white; padding:15px; border-radius:10px; display:inline-block; margin-bottom: 20px;">
+                    </div>
                     <h1 id="audience-timer" style="font-size: 4rem; color:var(--blue-bright); margin:0;">40</h1>
                 </div>
                 <div style="flex:2; display:flex; flex-direction:column; justify-content:center; gap: 20px;">
                     <div class="bar-row">
                         <span class="bar-label">A</span>
-                        <div class="bar-bg"><div id="bar-A" class="bar-fill" style="width: 0%; background: #ff4444;"></div></div>
+                        <div class="bar-bg">
+                            <div id="bar-A" class="bar-fill" style="width: 0%; background: #ff4444;"></div>
+                        </div>
                         <span id="pct-A" class="bar-pct">0%</span>
                     </div>
                     <div class="bar-row">
                         <span class="bar-label">B</span>
-                        <div class="bar-bg"><div id="bar-B" class="bar-fill" style="width: 0%; background: #4444ff;"></div></div>
+                        <div class="bar-bg">
+                            <div id="bar-B" class="bar-fill" style="width: 0%; background: #4444ff;"></div>
+                        </div>
                         <span id="pct-B" class="bar-pct">0%</span>
                     </div>
                     <div class="bar-row">
                         <span class="bar-label">C</span>
-                        <div class="bar-bg"><div id="bar-C" class="bar-fill" style="width: 0%; background: #ffaa00;"></div></div>
+                        <div class="bar-bg">
+                            <div id="bar-C" class="bar-fill" style="width: 0%; background: #ffaa00;"></div>
+                        </div>
                         <span id="pct-C" class="bar-pct">0%</span>
                     </div>
                     <div class="bar-row">
                         <span class="bar-label">D</span>
-                        <div class="bar-bg"><div id="bar-D" class="bar-fill" style="width: 0%; background: #44ff44;"></div></div>
+                        <div class="bar-bg">
+                            <div id="bar-D" class="bar-fill" style="width: 0%; background: #44ff44;"></div>
+                        </div>
                         <span id="pct-D" class="bar-pct">0%</span>
                     </div>
                 </div>
@@ -192,16 +239,17 @@
             <button onclick="addNewRow()" class="btn-dev"><i class="fas fa-plus"></i> AÑADIR FILA</button>
             <button onclick="saveAdminData()" class="btn-dev" style="color: #00ff00; border-color: #00ff00;"><i
                     class="fas fa-save"></i> GUARDAR EN NAVEGADOR</button>
-            <button onclick="showScreen('screen-home')" class="btn-dev"><i class="fas fa-arrow-left"></i>
-                VOLVER</button>
+            <button onclick="showScreen('screen-home')" class="btn-dev"><i class="fas fa-arrow-left"></i> VOLVER A
+                50x15</button>
         </div>
 
         <div class="master-control">
             <h3><i class="fas fa-palette"></i> TEMAS DE PREGUNTAS</h3>
-            <p style="color:#aaa; font-size:0.85rem; margin-top:0;">Guarda diferentes sets de preguntas como temas y cámbialos cuando quieras.</p>
-            
+            <p style="color:#aaa; font-size:0.85rem; margin-top:0;">Guarda diferentes sets de preguntas como temas y
+                cámbialos cuando quieras.</p>
+
             <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:15px;">
-                <input type="text" id="theme-name" placeholder="Nombre del tema (ej: Antiguo Testamento)" 
+                <input type="text" id="theme-name" placeholder="Nombre del tema (ej: Antiguo Testamento)"
                     style="flex:1; min-width:200px; padding:10px; border-radius:8px; border:2px solid var(--gold); background:#111; color:white; font-size:1rem;">
                 <button onclick="saveTheme()" class="btn-dev" style="color:#00ff00; border-color:#00ff00;">
                     <i class="fas fa-save"></i> GUARDAR TEMA</button>
@@ -222,7 +270,9 @@
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script src="js/shared.js"></script>
+    <script src="js/game-50x15.js"></script>
+    <script src="js/admin.js"></script>
 </body>
 
 </html>

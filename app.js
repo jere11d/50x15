@@ -73,11 +73,49 @@ function showScreen(screenId) {
     if (target) target.style.display = 'flex';
     if (screenId === 'screen-admin') { renderAdminTable(); renderThemesList(); }
 
-    // Integración Musical
-    if (screenId === 'screen-home') {
+    // Manejar el fondo del body: launcher vs juegos
+    const toggle = document.querySelector('.theme-toggle');
+    if (screenId === 'screen-launcher') {
+        document.body.classList.add('launcher-active');
+        if (toggle) toggle.style.display = 'flex';
         playBGM('salvapantallas.mp3');
+    } else {
+        document.body.classList.remove('launcher-active');
+        if (toggle) toggle.style.display = 'none';
+        if (screenId === 'screen-home') {
+            playBGM('salvapantallas.mp3');
+        }
     }
 }
+
+function showComingSoon(gameName) {
+    alert(`🔒 ${gameName}\n\n¡Este juego estará disponible próximamente!\nEstamos trabajando en traerte nuevas experiencias bíblicas.`);
+}
+
+function toggleLauncherTheme() {
+    const body = document.body;
+    const current = body.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    body.setAttribute('data-theme', next);
+    
+    const icon = document.getElementById('theme-icon');
+    if (icon) {
+        icon.className = next === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+    }
+    
+    // Persistir preferencia
+    try { localStorage.setItem('launcher_theme', next); } catch(e) {}
+}
+
+// Restaurar tema guardado al cargar
+try {
+    const saved = localStorage.getItem('launcher_theme');
+    if (saved) {
+        document.body.setAttribute('data-theme', saved);
+        const icon = document.getElementById('theme-icon');
+        if (icon) icon.className = saved === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+    }
+} catch(e) {}
 
 // --- LÓGICA DE PAUSA PROFESIONAL ---
 

@@ -1,0 +1,215 @@
+/* ============================================================
+   LAUNCHER.CSS — Centro de Juegos Bíblicos (Minimalista)
+   Diseño independiente con Dark / Light mode
+   ============================================================ */
+
+/* --- Variables por tema --- */
+[data-theme="dark"] {
+    --launcher-bg: #121212;
+    --launcher-bg2: #1a1a2e;
+    --launcher-text: #e0e0e0;
+    --launcher-text-secondary: #888;
+    --launcher-card-bg: #1e1e2f;
+    --launcher-card-border: #2a2a3d;
+    --launcher-card-hover-border: #555;
+    --launcher-card-shadow: rgba(0,0,0,0.4);
+    --launcher-accent: #a78bfa;
+    --launcher-accent-glow: rgba(167, 139, 250, 0.2);
+    --launcher-icon-bg: #252540;
+    --launcher-toggle-bg: #2a2a3d;
+    --launcher-badge-bg: rgba(167, 139, 250, 0.1);
+}
+
+[data-theme="light"] {
+    --launcher-bg: #f5f5f7;
+    --launcher-bg2: #eeeef3;
+    --launcher-text: #1a1a2e;
+    --launcher-text-secondary: #777;
+    --launcher-card-bg: #ffffff;
+    --launcher-card-border: #e0e0e5;
+    --launcher-card-hover-border: #bbb;
+    --launcher-card-shadow: rgba(0,0,0,0.08);
+    --launcher-accent: #7c3aed;
+    --launcher-accent-glow: rgba(124, 58, 237, 0.12);
+    --launcher-icon-bg: #f0ecff;
+    --launcher-toggle-bg: #e8e8ed;
+    --launcher-badge-bg: rgba(124, 58, 237, 0.08);
+}
+
+/* --- Fondo del body cuando el launcher está activo --- */
+body.launcher-active {
+    background: linear-gradient(145deg, var(--launcher-bg) 0%, var(--launcher-bg2) 100%);
+    transition: background 0.5s ease;
+}
+
+/* --- Pantalla del launcher --- */
+.launcher-screen {
+    font-family: 'Segoe UI', 'Inter', -apple-system, sans-serif;
+}
+
+/* --- Toggle dark/light --- */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 25px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid var(--launcher-card-border);
+    background: var(--launcher-toggle-bg);
+    color: var(--launcher-accent);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    z-index: 100;
+}
+
+.theme-toggle:hover {
+    border-color: var(--launcher-accent);
+    transform: scale(1.1);
+    box-shadow: 0 0 15px var(--launcher-accent-glow);
+}
+
+/* --- Título del launcher --- */
+.launcher-title {
+    font-size: clamp(1.8rem, 5vw, 3.2rem);
+    font-weight: 800;
+    text-align: center;
+    color: var(--launcher-text);
+    margin-bottom: 8px;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    transition: color 0.4s;
+}
+
+.launcher-title span {
+    font-size: 0.55em;
+    color: var(--launcher-accent);
+    letter-spacing: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* --- Galería --- */
+.gallery-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 35px;
+    max-width: 900px;
+}
+
+/* --- Tarjetas de juego --- */
+.game-card {
+    background: var(--launcher-card-bg);
+    border: 1.5px solid var(--launcher-card-border);
+    border-radius: 16px;
+    padding: 30px 25px 25px;
+    width: 240px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 12px var(--launcher-card-shadow);
+}
+
+.game-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--launcher-card-hover-border);
+    box-shadow: 0 12px 35px var(--launcher-card-shadow), 0 0 0 1px var(--launcher-card-hover-border);
+}
+
+/* Icono contenedor */
+.card-icon {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 18px;
+    border-radius: 16px;
+    background: var(--launcher-icon-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.game-card:hover .card-icon {
+    background: var(--launcher-accent);
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px var(--launcher-accent-glow);
+}
+
+.game-card .card-icon i {
+    font-size: 1.6rem;
+    color: var(--launcher-accent);
+    transition: color 0.3s;
+}
+
+.game-card:hover .card-icon i {
+    color: white;
+}
+
+.game-card h3 {
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    color: var(--launcher-text);
+    margin: 0 0 6px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    transition: color 0.4s;
+}
+
+.game-card p {
+    font-size: clamp(0.7rem, 1.1vw, 0.82rem);
+    color: var(--launcher-text-secondary);
+    margin: 0;
+    font-weight: 400;
+    line-height: 1.4;
+    transition: color 0.4s;
+}
+
+/* --- Tarjeta bloqueada --- */
+.game-card.locked {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.game-card.locked:hover {
+    transform: translateY(-3px);
+}
+
+.game-card.locked .card-icon {
+    background: var(--launcher-toggle-bg);
+}
+
+.game-card.locked:hover .card-icon {
+    background: var(--launcher-toggle-bg);
+    transform: none;
+    box-shadow: none;
+}
+
+.game-card.locked .card-icon i {
+    color: var(--launcher-text-secondary);
+}
+
+.game-card.locked:hover .card-icon i {
+    color: var(--launcher-text-secondary);
+}
+
+/* --- Badge "Próximamente" --- */
+.badge-soon {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 4px 12px;
+    font-size: 0.6rem;
+    color: var(--launcher-accent);
+    background: var(--launcher-badge-bg);
+    border: 1px solid var(--launcher-accent);
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    opacity: 0.8;
+}

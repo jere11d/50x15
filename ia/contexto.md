@@ -20,11 +20,20 @@
 
 ```
 50x15/
-├── index.html          # Página principal (menú, juego, gestión de preguntas)
-├── votar.html          # Página móvil para votación del público (Kahoot-like)
-├── style.css           # Estilos globales (tema oscuro, azul/dorado)
-├── app.js              # Lógica completa del juego
+├── index.html          # Página principal (launcher + juegos + admin)
+├── votar.html          # Página móvil para votación del público
+├── style.css           # [DEPRECADO] Archivo original, ahora en css/
+├── app.js              # [DEPRECADO] Archivo original, ahora en js/
 ├── questions.json      # Base de datos de preguntas de ejemplo
+├── css/                # Estilos modulares
+│   ├── shared.css      # Variables, body, .screen, overlays, botones comunes
+│   ├── launcher.css    # Centro de Juegos (dark/light mode, tarjetas)
+│   ├── game-50x15.css  # Estilos exclusivos del juego 50x15
+│   └── admin.css       # Panel de gestión, tabla, temas
+├── js/                 # JavaScript modular
+│   ├── shared.js       # Firebase, audio, navegación, theme toggle
+│   ├── game-50x15.js   # Lógica del juego 50x15 completa
+│   └── admin.js        # Gestión de preguntas y sistema de temas
 ├── assets/             # Carpeta de audio/SFX
 │   ├── 50 50.mp3
 │   ├── cambio de pantalla.mp3

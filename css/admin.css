@@ -1,0 +1,69 @@
+/* ============================================================
+   ADMIN.CSS — Panel de gestión de preguntas y temas
+   ============================================================ */
+
+/* --- BOTONES DEL PANEL ADMIN --- */
+.btn-dev {
+    background: transparent;
+    border: 2px solid #888;
+    color: #ccc;
+    padding: 8px 15px;
+    font-family: 'Arial Black', sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.btn-dev:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: var(--gold);
+    color: white;
+}
+
+.btn-dev.danger {
+    color: #ff4444;
+    border-color: #ff4444;
+}
+
+.btn-dev.danger:hover {
+    background: rgba(255,0,0,0.15);
+}
+
+/* --- TABLA DE PREGUNTAS --- */
+#questions-table {
+    width: 100%;
+    color: black;
+    border-collapse: collapse;
+}
+
+#questions-table input {
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+}
+
+.admin-controls {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* --- SECCIÓN TEMAS / MASTER CONTROL --- */
+.master-control {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid #333;
+    border-radius: 15px;
+    width: 95%;
+}
+
+.master-control h3 {
+    color: var(--gold);
+    margin-top: 0;
+    font-size: 1.1rem;
+}
