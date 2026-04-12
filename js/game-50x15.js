@@ -4,6 +4,7 @@
 
 let pendingAnswerIndex = -1;
 let evaluating = false;
+let waitingForSpace = false; // Fase de lectura: esperar ESPACIO para iniciar timer
 
 // --- VARIABLES GLOBALES ---
 let gameData = [];
@@ -173,10 +174,26 @@ function loadQuestion() {
     btnRetire.style.display = (currentIdx === 4 || currentIdx === 9) ? 'block' : 'none';
 
     renderLadder();
-    resetTimer();
+
+    // Fase de lectura: mostrar tiempo pero NO arrancar
+    clearInterval(timer);
+    timeLeft = (currentIdx < 5) ? 15 : (currentIdx < 10) ? 30 : 45;
+    document.getElementById('game-timer').innerText = timeLeft;
+    waitingForSpace = true;
+
+    // Indicador visual
+    const timerEl = document.getElementById('game-timer');
+    timerEl.style.opacity = '0.4';
+
+    // Deshabilitar opciones visualmente
+    document.querySelectorAll('.diamond-box.option').forEach(el => {
+        el.style.pointerEvents = 'none';
+        el.style.opacity = '0.5';
+    });
 }
 
 function checkAnswer(sel) {
+    if (waitingForSpace) return; // Bloqueado durante lectura
     if (evaluating) return;
     if (timeLeft <= 0) return; 
 
@@ -377,3 +394,26 @@ function usePeople() {
         }
     }, 1000);
 }
+
+// --- ESPACIO PARA INICIAR TIMER (Fase de lectura) ---
+document.addEventListener('keydown', function(e) {
+    if (e.code !== 'Space') return;
+    if (!waitingForSpace) return;
+    
+    // Solo si estamos en la pantalla del juego
+    const gameScreen = document.getElementById('screen-game');
+    if (!gameScreen || gameScreen.style.display === 'none') return;
+
+    e.preventDefault();
+    waitingForSpace = false;
+
+    // Restaurar visual
+    document.getElementById('game-timer').style.opacity = '1';
+    document.querySelectorAll('.diamond-box.option').forEach(el => {
+        el.style.pointerEvents = 'auto';
+        el.style.opacity = '1';
+    });
+
+    // Arrancar el timer
+    resetTimer();
+});
