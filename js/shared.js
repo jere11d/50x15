@@ -88,7 +88,7 @@ function showScreen(screenId) {
         document.body.classList.remove('launcher-active');
         if (toggle) toggle.style.display = 'none';
         if (backBtn) backBtn.style.display = 'flex';
-        if (screenId === 'screen-home') {
+        if (screenId === 'screen-home' || screenId === 'screen-who-home') {
             stopAllAudio();
             playBGM('salvapantallas.mp3');
         }

@@ -38,7 +38,7 @@
                 <h3>50 x 15</h3>
                 <p>El clásico camino al millón.</p>
             </div>
-            <div class="game-card" onclick="startWhoAmI()">
+            <div class="game-card" onclick="showScreen('screen-who-home')">
                 <div class="card-icon"><i class="fas fa-user-secret"></i></div>
                 <h3>¿Quién Soy?</h3>
                 <p>Adivina el personaje bíblico con pistas.</p>
@@ -77,6 +77,18 @@
     </div>
     </div>
 
+    <!-- MENÚ DE QUIÉN SOY -->
+    <div id="screen-who-home" class="screen" style="display:none; background: radial-gradient(circle, #1a0f00 0%, #000 100%);">
+        <div class="logo-container">
+            <h1 class="main-title" style="color: #ffd700; text-shadow: 0 0 15px #ff9900;">¿QUIÉN<br><span>SOY?</span></h1>
+        </div>
+        <div class="menu-buttons">
+            <button onclick="startWhoAmI()" class="btn-menu pulse"><i class="fas fa-play"></i> NUEVA PARTIDA</button>
+            <button onclick="switchAdminTab('who'); showScreen('screen-admin');" class="btn-menu"><i class="fas fa-edit"></i> GESTIONAR PERSONAJES</button>
+            <button onclick="goToLauncher()" class="btn-menu" style="background: rgba(255,255,255,0.1); border-color:#555;"><i class="fas fa-arrow-left"></i> CENTRO DE JUEGOS</button>
+        </div>
+    </div>
+
     <!-- MENÚ DE 50x15 -->
     <div id="screen-home" class="screen" style="display:none;">
         <div class="logo-container">
@@ -85,7 +97,7 @@
         <div class="menu-buttons">
             <button onclick="startGame()" class="btn-menu pulse"><i class="fas fa-play"></i> NUEVA PARTIDA</button>
             <button onclick="resumeGame()" class="btn-menu"><i class="fas fa-history"></i> CONTINUAR</button>
-            <button onclick="showScreen('screen-admin')" class="btn-menu"><i class="fas fa-edit"></i> GESTIONAR
+            <button onclick="switchAdminTab('50x15'); showScreen('screen-admin');" class="btn-menu"><i class="fas fa-edit"></i> GESTIONAR
                 PREGUNTAS</button>
         </div>
     </div>
