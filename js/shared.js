@@ -24,16 +24,35 @@ const bgmPlayer = new Audio();
 bgmPlayer.loop = true;
 const sfxPlayer = new Audio();
 
+function stopAllAudio() {
+    bgmPlayer.pause();
+    bgmPlayer.currentTime = 0;
+    sfxPlayer.pause();
+    sfxPlayer.currentTime = 0;
+}
+
 function playBGM(src) {
-    if(!src) { bgmPlayer.pause(); return; }
-    if(bgmPlayer.src.includes(encodeURI(src)) && !bgmPlayer.paused) return;
+    if (!src) { 
+        bgmPlayer.pause(); 
+        bgmPlayer.currentTime = 0;
+        return; 
+    }
+    // Si ya está sonando la misma canción, no reiniciar
+    if (bgmPlayer.src.includes(encodeURI(src)) && !bgmPlayer.paused) return;
+    // Si es la misma pero está pausada, solo reanudar
+    if (bgmPlayer.src.includes(encodeURI(src)) && bgmPlayer.paused) {
+        bgmPlayer.currentTime = 0;
+        bgmPlayer.play().catch(e => console.log("Autoplay bloqueado"));
+        return;
+    }
+    // Canción nueva: cambiar src
     bgmPlayer.src = `assets/${src}`;
-    bgmPlayer.play().catch(e=>console.log("Autoplay bloqueado"));
+    bgmPlayer.play().catch(e => console.log("Autoplay bloqueado"));
 }
 
 function playSFX(src) {
     sfxPlayer.src = `assets/${src}`;
-    sfxPlayer.play().catch(e=>console.log("Autoplay bloqueado"));
+    sfxPlayer.play().catch(e => console.log("Autoplay bloqueado"));
 }
 
 // --- NAVEGACIÓN ---
@@ -59,17 +78,14 @@ function showScreen(screenId) {
         document.body.classList.add('launcher-active');
         if (toggle) toggle.style.display = 'flex';
         if (backBtn) backBtn.style.display = 'none';
-        // Forzar parar todo audio del juego
-        sfxPlayer.pause();
-        sfxPlayer.currentTime = 0;
+        stopAllAudio();
         playBGM('salvapantallas.mp3');
     } else {
         document.body.classList.remove('launcher-active');
         if (toggle) toggle.style.display = 'none';
         if (backBtn) backBtn.style.display = 'flex';
         if (screenId === 'screen-home') {
-            sfxPlayer.pause();
-            sfxPlayer.currentTime = 0;
+            stopAllAudio();
             playBGM('salvapantallas.mp3');
         }
     }
